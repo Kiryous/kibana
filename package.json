@@ -621,6 +621,7 @@
     "@kbn/kbn-top-nav-plugin": "link:src/platform/test/plugin_functional/plugins/kbn_top_nav",
     "@kbn/kbn-tp-custom-visualizations-plugin": "link:src/platform/test/plugin_functional/plugins/kbn_tp_custom_visualizations",
     "@kbn/kbn-tp-run-pipeline-plugin": "link:src/platform/test/interpreter_functional/plugins/kbn_tp_run_pipeline",
+    "@kbn/keep-workflows": "link:x-pack/solutions/security/plugins/keep_workflows",
     "@kbn/key-value-metadata-table": "link:x-pack/platform/packages/shared/kbn-key-value-metadata-table",
     "@kbn/kibana-api-cli": "link:x-pack/platform/packages/shared/kbn-kibana-api-cli",
     "@kbn/kibana-cors-test-plugin": "link:x-pack/test/functional_cors/plugins/kibana_cors_test",

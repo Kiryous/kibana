@@ -1,0 +1,14 @@
+{
+  "type": "plugin",
+  "id": "@kbn/keep-workflows",
+  "owner": "@elastic/kibana-core",
+  "description": "Automate repetitive tasks",
+  "group": "security",
+  "plugin": {
+    "id": "keepWorkflows",
+    "server": true,
+    "browser": true,
+    "requiredPlugins": ["navigation", "cloudSecurityPosture", "kibanaReact", "unifiedSearch"],
+    "configPath": ["xpack", "securitySolution"]
+  }
+}

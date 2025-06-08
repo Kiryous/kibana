@@ -1,0 +1,7 @@
+{
+  "prefix": "keepWorkflows",
+  "paths": {
+    "keepWorkflows": "."
+  },
+  "translations": ["translations/ja-JP.json"]
+}

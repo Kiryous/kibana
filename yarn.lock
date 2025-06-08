@@ -6038,6 +6038,10 @@
   version "0.0.0"
   uid ""
 
+"@kbn/keep-workflows@link:x-pack/solutions/security/plugins/keep_workflows":
+  version "0.0.0"
+  uid ""
+
 "@kbn/key-value-metadata-table@link:x-pack/platform/packages/shared/kbn-key-value-metadata-table":
   version "0.0.0"
   uid ""
