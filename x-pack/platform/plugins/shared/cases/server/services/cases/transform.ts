@@ -32,7 +32,11 @@ import {
   transformESConnectorToExternalModel,
 } from '../transform';
 import { ConnectorReferenceHandler } from '../connector_reference_handler';
-import type { CasePersistedAttributes, CaseTransformedAttributes } from '../../common/types/case';
+import type {
+  CasePersistedAttributes,
+  CaseTransformedAttributes,
+  CaseTransformedAttributesWithAttachmentStats,
+} from '../../common/types/case';
 import type { ExternalServicePersisted } from '../../common/types/external_service';
 
 export function transformUpdateResponseToExternalModel(
@@ -89,21 +93,21 @@ export function transformAttributesToESModel(caseAttributes: CaseTransformedAttr
   attributes: CasePersistedAttributes;
   referenceHandler: ConnectorReferenceHandler;
 };
-export function transformAttributesToESModel(caseAttributes: Partial<CaseTransformedAttributes>): {
+
+export function transformAttributesToESModel(
+  caseAttributes: Partial<CaseTransformedAttributesWithAttachmentStats>
+): {
   attributes: Partial<CasePersistedAttributes>;
   referenceHandler: ConnectorReferenceHandler;
 };
+
 export function transformAttributesToESModel(caseAttributes: Partial<CaseTransformedAttributes>): {
   attributes: Partial<CasePersistedAttributes>;
   referenceHandler: ConnectorReferenceHandler;
 } {
-  const { connector, external_service, severity, status, ...restAttributes } = caseAttributes;
+  const { connector, external_service, severity, status, incremental_id, ...restAttributes } =
+    caseAttributes;
   const { connector_id: pushConnectorId, ...restExternalService } = external_service ?? {};
-
-  // remove incremental_id, this one's reserved to be set by the system
-  if ('incremental_id' in restAttributes) {
-    delete restAttributes.incremental_id;
-  }
 
   const transformedConnector = {
     ...(connector && {
