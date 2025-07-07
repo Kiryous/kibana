@@ -9,6 +9,18 @@ import type { NodeDefinition } from '@kbn/core-chrome-browser';
 import { SecurityPageName } from '../constants';
 import { securityLink } from '../links';
 
+export const createWorkflowsNavigationTree = (): NodeDefinition => ({
+  id: SecurityPageName.workflows,
+  link: securityLink(SecurityPageName.workflows),
+  renderAs: 'item',
+  children: [
+    {
+      id: SecurityPageName.workflowsList,
+      link: securityLink(SecurityPageName.workflowsList),
+    },
+  ],
+});
+
 export const createDashboardsNavigationTree = (): NodeDefinition => ({
   id: SecurityPageName.dashboards,
   link: securityLink(SecurityPageName.dashboards),

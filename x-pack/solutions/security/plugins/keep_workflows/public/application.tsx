@@ -2,6 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import type { AppMountParameters, CoreStart } from '@kbn/core/public';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { KibanaContextProvider } from '@kbn/kibana-react-plugin/public';
 import type { AppPluginStartDependencies } from './types';
 import { KeepWorkflowsApp } from './components/app';
 
@@ -13,14 +14,16 @@ export const renderApp = (
   { appBasePath, element }: AppMountParameters
 ) => {
   ReactDOM.render(
-    <QueryClientProvider client={queryClient}>
-      <KeepWorkflowsApp
-        basename={appBasePath}
-        notifications={notifications}
-        http={http}
-        navigation={navigation}
-      />
-    </QueryClientProvider>,
+    <KibanaContextProvider services={{ notifications, http }}>
+      <QueryClientProvider client={queryClient}>
+        <KeepWorkflowsApp
+          basename={appBasePath}
+          notifications={notifications}
+          http={http}
+          navigation={navigation}
+        />
+      </QueryClientProvider>
+    </KibanaContextProvider>,
     element
   );
 

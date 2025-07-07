@@ -33,6 +33,7 @@ export const createNavigationTree = (services: Services): NavigationTreeDefiniti
         {
           link: 'discover',
         },
+        defaultNavigationTree.workflows(),
         defaultNavigationTree.dashboards(),
         {
           breadcrumbStatus: 'hidden',

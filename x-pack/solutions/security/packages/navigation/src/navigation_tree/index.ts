@@ -5,7 +5,10 @@
  * 2.0.
  */
 
-import { createDashboardsNavigationTree } from './dashboards_navigation_tree';
+import {
+  createDashboardsNavigationTree,
+  createWorkflowsNavigationTree,
+} from './dashboards_navigation_tree';
 import { createRulesNavigationTree } from './rules_navigation_tree';
 import { createCasesNavigationTree } from './cases_navigation_tree';
 import { createInvestigationsNavigationTree } from './investigations_navigation_tree';
@@ -15,6 +18,7 @@ import { createEntityAnalyticsNavigationTree } from './entity_analytics_navigati
 import { createMachineLearningNavigationTree } from './ml_navigation_tree';
 
 export const defaultNavigationTree = {
+  workflows: createWorkflowsNavigationTree,
   dashboards: createDashboardsNavigationTree,
   rules: createRulesNavigationTree,
   cases: createCasesNavigationTree,

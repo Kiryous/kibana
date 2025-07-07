@@ -2,13 +2,11 @@ import { EuiFlexGroup, EuiFlexItem, EuiLoadingSpinner } from '@elastic/eui';
 import { css } from '@emotion/react';
 import { CodeEditor } from '@kbn/code-editor';
 import { CoreStart } from '@kbn/core/public';
-import { i18n } from '@kbn/i18n';
 import { configureMonacoYamlSchema } from '@kbn/monaco';
 import React, { useState, useEffect } from 'react';
 import { Graph } from '@kbn/cloud-security-posture-graph';
 import type { NodeViewModel, EdgeViewModel } from '@kbn/cloud-security-posture-graph';
 import yaml from 'yaml';
-import { name } from 'mustache';
 
 export const YAMLCodeEditor = ({
   http,

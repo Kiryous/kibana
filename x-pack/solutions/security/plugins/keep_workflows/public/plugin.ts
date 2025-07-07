@@ -13,10 +13,10 @@ export class KeepWorkflowsPlugin
   public setup(core: CoreSetup): KeepWorkflowsPluginSetup {
     // Register an application into the side navigation menu
     core.application.register({
-      id: 'keepWorkflows',
+      id: 'workflows',
       title: PLUGIN_NAME,
       appRoute: '/app/keep-workflows',
-      visibleIn: ['globalSearch', 'home', 'kibanaOverview'],
+      visibleIn: ['globalSearch', 'home', 'kibanaOverview', 'sideNav'],
       async mount(params: AppMountParameters) {
         // Load application bundle
         const { renderApp } = await import('./application');

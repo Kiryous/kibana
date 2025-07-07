@@ -20,7 +20,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import { Chart, BarSeries, ScaleType, Settings } from '@elastic/charts';
 import { WorkflowDetail } from './workflow_detail';
-import { Workflow, WorkflowsPaginatedResponse } from '../model/types';
+import { Workflow, WorkflowsPaginatedResponse } from '../shared/model/types';
 
 interface KeepWorkflowsAppDeps {
   basename: string;

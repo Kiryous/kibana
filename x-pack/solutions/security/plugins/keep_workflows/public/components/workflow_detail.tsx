@@ -13,8 +13,9 @@ import { useQuery } from '@tanstack/react-query';
 import React from 'react';
 import { FormattedMessage } from '@kbn/i18n-react';
 import { Link } from 'react-router-dom';
-import { Workflow } from '../model/types';
-import { WorkflowBuilder } from './workflow_builder';
+import { Workflow } from '../shared/model/types';
+// import { WorkflowBuilder } from './workflow_builder';
+import { WorkflowBuilderWidget } from '../widgets/workflow-builder';
 
 export const WorkflowDetail = ({
   basename,
@@ -77,11 +78,15 @@ export const WorkflowDetail = ({
             </EuiFlexGroup>
           </EuiFlexGroup>
         </EuiPageTemplate.Header>
-        <EuiPageTemplate.Section>
-          <WorkflowBuilder
+        <EuiPageTemplate.Section restrictWidth={false}>
+          {/* <WorkflowBuilder
             http={http}
             notifications={notifications}
             workflowYaml={workflow?.workflow_raw ?? ''}
+          /> */}
+          <WorkflowBuilderWidget
+            workflowRaw={workflow?.workflow_raw ?? ''}
+            workflowId={workflowId}
           />
         </EuiPageTemplate.Section>
       </EuiPageTemplate>

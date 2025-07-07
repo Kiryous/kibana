@@ -108,4 +108,37 @@ export function defineRoutes(router: IRouter) {
       }
     }
   );
+  router.get(
+    {
+      path: '/api/providers',
+      validate: false,
+      security: {
+        authz: {
+          requiredPrivileges: ['all'],
+        },
+      },
+    },
+    async (context, request, response) => {
+      try {
+        const externalData = await fetch(`${KEEP_API_BASE_URL}/providers`, {
+          method: 'GET',
+          headers: {
+            'x-api-key': 'keep-api-key',
+            'Content-Type': 'application/json',
+          },
+        }).then((res) => res.json());
+        return response.ok({
+          body: externalData,
+        });
+      } catch (error) {
+        console.error(error);
+        return response.customError({
+          statusCode: 500,
+          body: {
+            message: `Internal server error: ${error}`,
+          },
+        });
+      }
+    }
+  );
 }

@@ -15,6 +15,7 @@
       "securitySolution"
     ],
     "requiredPlugins": [
+      "keepWorkflows",
       "actions",
       "alerting",
       "cases",

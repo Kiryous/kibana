@@ -316,6 +316,7 @@ export class Plugin implements IPlugin<PluginSetup, PluginStart, SetupPlugins, S
     if (!this._subPlugins) {
       const { subPluginClasses } = await this.lazySubPlugins();
       this._subPlugins = {
+        workflows: new subPluginClasses.Workflows(),
         alerts: new subPluginClasses.Detections(),
         assetInventory: new subPluginClasses.AssetInventory(),
         attackDiscovery: new subPluginClasses.AttackDiscovery(),
@@ -346,6 +347,7 @@ export class Plugin implements IPlugin<PluginSetup, PluginStart, SetupPlugins, S
     const subPlugins = await this.createSubPlugins();
     const alerts = await subPlugins.alerts.start(storage, plugins);
     return {
+      workflows: subPlugins.workflows.start(),
       alerts,
       assetInventory: subPlugins.assetInventory.start(),
       attackDiscovery: subPlugins.attackDiscovery.start(),

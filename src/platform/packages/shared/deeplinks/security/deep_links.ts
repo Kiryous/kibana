@@ -8,6 +8,8 @@
  */
 
 export enum SecurityPageName {
+  workflows = 'workflows',
+  workflowsList = 'keep_workflows',
   administration = 'administration',
   alerts = 'alerts',
   assetInventory = 'asset_inventory',

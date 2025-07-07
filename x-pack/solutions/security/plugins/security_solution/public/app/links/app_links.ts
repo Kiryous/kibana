@@ -9,7 +9,7 @@ import type { CoreStart } from '@kbn/core/public';
 import { configurationsLinks } from '../../configurations/links';
 import { links as attackDiscoveryLinks } from '../../attack_discovery/links';
 import { links as assetInventoryLinks } from '../../asset_inventory/links';
-import type { AppLinkItems } from '../../common/links/types';
+import type { AppLinkItems, LinkItem } from '../../common/links/types';
 import { indicatorsLinks } from '../../threat_intelligence/links';
 import { alertsLink, alertSummaryLink } from '../../detections/links';
 import { links as rulesLinks } from '../../rules/links';
@@ -22,8 +22,21 @@ import { findingsLinks } from '../../cloud_security_posture/links';
 import type { StartPlugins } from '../../types';
 import { dashboardsLinks } from '../../dashboards/links';
 import { entityAnalyticsLinks } from '../../entity_analytics/links';
+import { SecurityPageName, SECURITY_FEATURE_ID } from '../../../common/constants';
+
+const workflowsLinks: LinkItem = {
+  id: SecurityPageName.workflows,
+  title: 'Workflows',
+  path: 'workflows',
+  globalNavPosition: 1,
+  capabilities: [[`${SECURITY_FEATURE_ID}.show`, `${SECURITY_FEATURE_ID}.detections`]],
+  globalSearchKeywords: ['Workflows'],
+  // links: subLinks,
+  skipUrlState: false,
+};
 
 export const appLinks: AppLinkItems = Object.freeze([
+  // workflowsLinks,
   dashboardsLinks,
   alertsLink,
   alertSummaryLink,
@@ -48,6 +61,7 @@ export const getFilteredLinks = async (
   const managementFilteredLinks = await getManagementFilteredLinks(core, plugins);
 
   return Object.freeze([
+    workflowsLinks,
     dashboardsLinks,
     alertsLink,
     alertSummaryLink,
