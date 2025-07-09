@@ -1,6 +1,6 @@
 import { Provider } from '@kbn/workflows';
 
-export const providers: Record<string, Provider> = {
+export const connectors: Record<string, Provider> = {
   console: {
     type: 'console',
     action: async (stepInputs?: Record<string, any>) => {

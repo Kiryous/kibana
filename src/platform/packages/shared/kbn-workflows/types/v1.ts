@@ -34,8 +34,8 @@ export interface Provider {
 
 export interface WorkflowStep {
   id: string;
-  providerType: string;
-  providerName: string;
+  connectorType: string;
+  connectorName: string;
   inputs: Record<string, any>;
   needs?: string[];
 }

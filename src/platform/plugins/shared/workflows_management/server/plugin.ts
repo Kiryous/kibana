@@ -49,15 +49,15 @@ export class WorkflowsPlugin implements Plugin<WorkflowsPluginSetup, WorkflowsPl
       workflow: WorkflowExecutionEngineModel
     ): Promise<Record<string, Record<string, any>>> => {
       const connectorNames = workflow.steps
-        .filter((step) => step.providerType.endsWith('-connector'))
-        .map((step) => step.providerName);
+        .filter((step) => step.connectorType.endsWith('-connector'))
+        .map((step) => step.connectorName);
       const distinctConnectorNames = Array.from(new Set(connectorNames));
       const allConnectors = await plugins.actions.getUnsecuredActionsClient().getAll('default');
       const connectorNameIdMap = new Map<string, string>(
         allConnectors.map((connector) => [connector.name, connector.id])
       );
 
-      return distinctConnectorNames.reduce((acc, name) => {å
+      return distinctConnectorNames.reduce((acc, name) => {
         const connectorId = connectorNameIdMap.get(name);
         if (connectorId) {
           acc['connector.' + name] = {
@@ -74,9 +74,7 @@ export class WorkflowsPlugin implements Plugin<WorkflowsPluginSetup, WorkflowsPl
 
         for (const workflow of worklfowsToRun) {
           const connectorCredentials = await extractConnectorIds(workflow);
-          const providerCredentials = {
-            ...connectorCredentials,
-          };
+
           const workflowRunId = generateUuid();
 
           plugins.taskManager.schedule({
@@ -87,7 +85,7 @@ export class WorkflowsPlugin implements Plugin<WorkflowsPluginSetup, WorkflowsPl
               eventType,
               context: {
                 workflowRunId,
-                providerCredentials,
+                connectorCredentials,
                 event: eventData,
               },
             },

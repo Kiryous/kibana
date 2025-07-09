@@ -5,7 +5,6 @@ import type {
   Plugin,
   Logger,
 } from '@kbn/core/server';
-import { TaskManagerStartContract } from '@kbn/task-manager-plugin/server';
 import {
   IUnsecuredActionsClient,
   PluginStartContract as ActionsPluginStartContract,
@@ -27,7 +26,7 @@ import type {
 import { StepRunner } from './step-runner/step-runner';
 import { TemplatingEngine } from './templating-engine';
 
-import { ProviderExecutor } from './provider-executor';
+import { ConnectorExecutor } from './connector-executor';
 
 export class WorkflowsExecutionEnginePlugin
   implements Plugin<WorkflowsExecutionEnginePluginSetup, WorkflowsExecutionEnginePluginStart>
@@ -47,16 +46,6 @@ export class WorkflowsExecutionEnginePlugin
 
   public setup(core: CoreSetup, plugins: WorkflowsExecutionEnginePluginSetupDeps) {
     this.logger.debug('workflows-execution-engine: Setup');
-    async function getTaskManager(): Promise<TaskManagerStartContract> {
-      const { taskManager } = await core.plugins.onStart<{ taskManager: TaskManagerStartContract }>(
-        'taskManager'
-      );
-      if (!taskManager.found) {
-        throw new Error('Task Manager plugin is not available');
-      }
-
-      return taskManager.contract;
-    }
 
     async function getActionsClient(): Promise<IUnsecuredActionsClient> {
       const { actions } = await core.plugins.onStart<{ actions: ActionsPluginStartContract }>(
@@ -75,7 +64,7 @@ export class WorkflowsExecutionEnginePlugin
     ) => {
       const workflowRunId = context['workflowRunId'];
       const stepRunner = new StepRunner(
-        new ProviderExecutor(context.providerCredentials, await getActionsClient()),
+        new ConnectorExecutor(context.connectorCredentials, await getActionsClient()),
         new TemplatingEngine()
       );
 

@@ -1,6 +1,6 @@
 import { WorkflowStep } from '@kbn/workflows';
 import { TemplatingEngine } from '../templating-engine';
-import { ProviderExecutor } from '../provider-executor';
+import { ConnectorExecutor } from '../connector-executor';
 
 export interface RunStepResult {
   output: Record<string, any> | undefined;
@@ -9,7 +9,7 @@ export interface RunStepResult {
 
 export class StepRunner {
   constructor(
-    private providerExecutor: ProviderExecutor,
+    private connectorExecutor: ConnectorExecutor,
     private templatingEngine: TemplatingEngine
   ) {}
 
@@ -26,9 +26,9 @@ export class StepRunner {
     }, {} as Record<string, any>);
 
     try {
-      const stepOutput = await this.providerExecutor.execute(
-        step.providerType,
-        step.providerName,
+      const stepOutput = await this.connectorExecutor.execute(
+        step.connectorType,
+        step.connectorName,
         renderedInputs
       );
       return {

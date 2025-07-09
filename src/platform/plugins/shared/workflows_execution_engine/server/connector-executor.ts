@@ -1,30 +1,30 @@
 import { IUnsecuredActionsClient } from '@kbn/actions-plugin/server';
-import { providers } from './mock';
+import { connectors } from './mock';
 
-export class ProviderExecutor {
+export class ConnectorExecutor {
   constructor(
-    private providerCredentials: Record<string, any>,
+    private connectorCredentials: Record<string, any>,
     private actionsClient: IUnsecuredActionsClient
   ) {}
 
   public async execute(
-    providerType: string,
-    providerName: string,
+    connectorType: string,
+    connectorName: string,
     inputs: Record<string, any>
   ): Promise<any> {
-    if (!providerType) {
-      throw new Error('Provider type is required');
+    if (!connectorType) {
+      throw new Error('Connector type is required');
     }
 
-    if (providerType.endsWith('connector')) {
-      await this.runConnector(providerName, inputs);
+    if (connectorType.endsWith('connector')) {
+      await this.runConnector(connectorName, inputs);
       return;
     }
 
-    const provider = providers[providerName];
+    const provider = connectors[connectorName];
 
     if (!provider) {
-      throw new Error(`Provider "${providerName}" not found`);
+      throw new Error(`Connector "${connectorName}" not found`);
     }
 
     provider.action(inputs);
@@ -34,10 +34,10 @@ export class ProviderExecutor {
     connectorName: string,
     connectorParams: Record<string, any>
   ): Promise<void> {
-    const connectorCredentials = this.providerCredentials['connector.' + connectorName];
+    const connectorCredentials = this.connectorCredentials['connector.' + connectorName];
 
     if (!connectorCredentials) {
-      throw new Error(`Provider credentials for "${connectorName}" not found`);
+      throw new Error(`Connector credentials for "${connectorName}" not found`);
     }
 
     const connectorId = connectorCredentials.id;

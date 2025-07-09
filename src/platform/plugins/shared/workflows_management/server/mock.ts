@@ -49,16 +49,16 @@ const workflows: WorkflowExecutionEngineModel[] = [
     steps: [
       {
         id: 'step1',
-        providerType: 'console',
-        providerName: 'console',
+        connectorType: 'console',
+        connectorName: 'console',
         inputs: {
           message: 'Step 1 executed "{{event.ruleName}}"',
         },
       },
       {
         id: 'step2',
-        providerName: 'slow-console',
-        providerType: 'console',
+        connectorName: 'slow-console',
+        connectorType: 'console',
         inputs: {
           message: 'Step 2 executed "{{event.additionalData.user}}"',
         },
@@ -66,8 +66,8 @@ const workflows: WorkflowExecutionEngineModel[] = [
       {
         id: 'step3',
         needs: ['step1', 'step2'],
-        providerType: 'slack-connector',
-        providerName: 'slack_keep',
+        connectorType: 'slack-connector',
+        connectorName: 'slack_keep',
         inputs: {
           message:
             'Message from step 3: Detection rule name is "{{event.ruleName}}" and user is "{{event.additionalData.user}}" and workflowRunId is "{{workflowRunId}}"',
@@ -76,8 +76,8 @@ const workflows: WorkflowExecutionEngineModel[] = [
       {
         id: 'step4',
         needs: ['step3'],
-        providerName: 'console',
-        providerType: 'console',
+        connectorName: 'console',
+        connectorType: 'console',
         inputs: {
           message: 'Step 4 executed!',
         },
