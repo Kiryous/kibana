@@ -8,25 +8,40 @@ import type {
 import { TaskManagerStartContract } from '@kbn/task-manager-plugin/server';
 
 import type { WorkflowsPluginSetup, WorkflowsPluginStart } from './types';
-import { defineRoutes } from './routes';
-import { WorkflowsManagementApi } from './api';
+import { defineRoutes } from './workflows_management/workflows_management_routes';
+import { WorkflowsManagementApi } from './workflows_management/workflows_management_api';
+import { WorkflowsService } from './workflows_management/workflows_management_service';
+import { Client } from '@elastic/elasticsearch';
 
 export class WorkflowsPlugin implements Plugin<WorkflowsPluginSetup, WorkflowsPluginStart> {
   private readonly logger: Logger;
+  private esClient: Client = new Client({
+    node: 'http://localhost:9200', // or your ES URL
+    auth: {
+      username: 'elastic',
+      password: 'changeme',
+    },
+  });
 
   constructor(initializerContext: PluginInitializerContext) {
     this.logger = initializerContext.logger.get();
   }
 
   public setup(core: CoreSetup) {
-    this.logger.debug('Workflows Management: Setup');
+    this.logger.info('Workflows Management: Setup');
     const router = core.http.createRouter();
+    const workflowsService = new WorkflowsService(
+      Promise.resolve(this.esClient),
+      this.logger,
+      '.workflows'
+    );
+    const api = new WorkflowsManagementApi(workflowsService);
 
     // Register server side APIs
-    defineRoutes(router);
+    defineRoutes(router, api);
 
     return {
-      management: WorkflowsManagementApi,
+      management: api,
     };
   }
 
