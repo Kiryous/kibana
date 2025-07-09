@@ -57,7 +57,7 @@ export class WorkflowsPlugin implements Plugin<WorkflowsPluginSetup, WorkflowsPl
         allConnectors.map((connector) => [connector.name, connector.id])
       );
 
-      return distinctConnectorNames.reduce((acc, name) => {
+      return distinctConnectorNames.reduce((acc, name) => {å
         const connectorId = connectorNameIdMap.get(name);
         if (connectorId) {
           acc['connector.' + name] = {
