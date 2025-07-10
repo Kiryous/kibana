@@ -1134,9 +1134,6 @@ x-pack/test/security_api_integration/plugins/oidc_provider @elastic/kibana-secur
 x-pack/test/security_api_integration/plugins/saml_provider @elastic/kibana-security
 x-pack/test/security_api_integration/plugins/user_profiles_consumer @elastic/kibana-security
 x-pack/test/security_functional/plugins/test_endpoints @elastic/kibana-security
-src/platform/plugins/shared/workflows_execution_engine @elastic/workflows-eng
-src/platform/plugins/shared/workflows_management @elastic/workflows-eng
-src/platform/packages/shared/kbn-workflows @elastic/workflows-eng
 ####
 ## Everything below this line overrides the default assignments for each package.
 ## Items lower in the file have higher precedence:
