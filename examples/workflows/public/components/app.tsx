@@ -113,7 +113,7 @@ export const WorkflowsApp = ({ basename, notifications, http, navigation }: Work
       .then((res) => {
         // Use the core notifications service to display a success message.
         notifications.toasts.addSuccess(
-          i18n.translate('workflows.dataUpdated', {
+          i18n.translate('workflowsExample.dataUpdated', {
             defaultMessage: 'Data updated',
           })
         );
@@ -131,7 +131,7 @@ export const WorkflowsApp = ({ basename, notifications, http, navigation }: Work
               <EuiTitle size="l">
                 <h1>
                   <FormattedMessage
-                    id="workflows.helloWorldText"
+                    id="workflowsExample.helloWorldText"
                     defaultMessage="{name}"
                     values={{ name: PLUGIN_NAME }}
                   />
@@ -142,7 +142,7 @@ export const WorkflowsApp = ({ basename, notifications, http, navigation }: Work
               <EuiTitle>
                 <h2>
                   <FormattedMessage
-                    id="workflows.congratulationsTitle"
+                    id="workflowsExample.congratulationsTitle"
                     defaultMessage="Enter workflow inputs, workflow body, and click Run! Have fun!"
                   />
                 </h2>
@@ -197,7 +197,7 @@ export const WorkflowsApp = ({ basename, notifications, http, navigation }: Work
               <EuiText>
                 <EuiButton type="submit" size="s" onClick={onClickHandler}>
                   <FormattedMessage
-                    id="workflows.buttonText"
+                    id="workflowsExample.buttonText"
                     defaultMessage="Run workflow"
                     ignoreTag
                   />
