@@ -1,7 +1,7 @@
 version: 1
 workflow:
-  name: 'Malicious Alert Handler' # this should be unique if no id?
-  description: 'Handle alerts based on maliciousness'
+  name: "Malicious Alert Handler" # this should be unique if no id?
+  description: "Handle alerts based on maliciousness"
   enabled: true
   triggers:
     - type: triggers.elastic.scheduled

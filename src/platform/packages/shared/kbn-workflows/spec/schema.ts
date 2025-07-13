@@ -4,12 +4,8 @@ import { z } from 'zod';
 export const DetectionRuleTriggerSchema = z.object({
   type: z.literal('triggers.elastic.detectionRule'),
   with: z.union([
-    z.object({
-      rule_id: z.string().min(1),
-    }),
-    z.object({
-      rule_name: z.string().min(1),
-    }),
+    z.object({ rule_id: z.string().min(1) }),
+    z.object({ rule_name: z.string().min(1) }),
   ]),
 });
 
@@ -20,9 +16,7 @@ export const ScheduledTriggerSchema = z.object({
       every: z.string().min(1),
       unit: z.enum(['minute', 'hour', 'day', 'week', 'month', 'year']),
     }),
-    z.object({
-      cron: z.string().min(1),
-    }),
+    z.object({ cron: z.string().min(1) }),
   ]),
 });
 
@@ -48,55 +42,68 @@ export const WorkflowOnFailureSchema = z.object({
   continue: z.boolean().optional(),
 });
 
-export const AbstractStepSchema = z.object({
-  name: z.string().min(1),
-  type: z.string().min(1),
-  with: z.record(z.string(), z.any()),
-  if: z.string().optional(),
-  foreach: z.string().optional(),
-  next: z.string().optional(), // default behavior is to continue to the next step
-  'on-failure': WorkflowOnFailureSchema,
-  timeout: z.number().optional(), // max time to run the step in seconds
+// Base step schema, with recursive steps property
+const BaseStepSchema: z.ZodType<any> = z.lazy(() =>
+  z.object({
+    name: z.string().min(1),
+    type: z.discriminatedUnion('type', [
+      ForEachStepSchema,
+      IfStepSchema,
+      AtomicStepSchema,
+      ParallelStepSchema,
+      MergeStepSchema,
+      // ...other step types
+    ]),
+    with: z.record(z.string(), z.any()).optional(),
+    if: z.string().optional(),
+    foreach: z.string().optional(),
+    // next: z.string().optional(),
+    onError: WorkflowOnFailureSchema.optional(),
+    timeout: z.number().optional(),
+  })
+);
+
+
+const ForEachStepSchema = z.object({
+  type: z.literal('forEach'),
+  name: z.string(),
+  foreach: z.string(),
+  steps: z.array(BaseStepSchema),
 });
 
-/* --- Example steps, will be generated from connectors --- */
-export const SlackSendMessageStepSchema = AbstractStepSchema.extend({
-  type: z.literal('slack.sendMessage'),
-  with: z.union([
+const IfStepSchema = z.object({
+  type: z.literal('if'),
+  name: z.string(),
+  condition: z.string(),
+  steps: z.array(BaseStepSchema),
+  else: z.array(BaseStepSchema).optional(),
+});
+
+const AtomicStepSchema = z.object({
+  type: z.string(),
+  name: z.string(),
+  // ...other atomic fields
+  steps: z.array(BaseStepSchema).optional(), // allow nesting even for atomic steps
+});
+
+const ParallelStepSchema = z.object({
+  type: z.literal('parallel'),
+  name: z.string(),
+  branches: z.array(
     z.object({
-      message: z.string().min(1),
-      username: z.string().min(1),
-    }),
-    z.object({
-      message: z.string().min(1),
-      channel: z.string().min(1),
-    }),
-  ]),
+      name: z.string(),
+      steps: z.array(BaseStepSchema),
+    })
+  ),
 });
 
-export const HttpGetStepSchema = AbstractStepSchema.extend({
-  type: z.literal('http.get'),
-  with: z.object({
-    url: z.string().min(1),
-    headers: z.record(z.string(), z.string()).optional(),
-  }),
+const MergeStepSchema = z.object({
+  type: z.literal('merge'),
+  name: z.string(),
+  sources: z.array(z.string()), // references to branches or steps to merge
+  steps: z.array(BaseStepSchema), // steps to run after merge
 });
 
-/* --- Flow steps --- */
-export const SwitchStepSchema = AbstractStepSchema.extend({
-  type: z.literal('flow.switch'),
-  with: z.object({
-    cases: z.array(
-      z.object({
-        condition: z.string().min(1),
-        next: z.string(),
-      })
-    ),
-    default: z.string().optional(),
-  }),
-});
-
-export const StepSchema = z.discriminatedUnion('type', [AbstractStepSchema, SwitchStepSchema]);
 
 /* --- Inputs --- */
 export const WorkflowInputTypeEnum = z.enum(['string', 'number', 'boolean', 'choice']);
@@ -106,7 +113,6 @@ const WorkflowInputBaseSchema = z.object({
   description: z.string().optional(),
   default: z.any().optional(),
   required: z.boolean().optional(),
-  // do we need 'visually-required' ?
 });
 
 const WorkflowInputStringSchema = WorkflowInputBaseSchema.extend({
@@ -158,7 +164,7 @@ export const WorkflowSchema = z.object({
   triggers: z.array(TriggerSchema).min(1),
   inputs: z.array(WorkflowInputSchema).optional(),
   consts: WorkflowConstsSchema.optional(),
-  steps: z.array(StepSchema).min(1),
+  steps: z.array(BaseStepSchema).min(1),
 });
 
 export type Workflow = z.infer<typeof WorkflowSchema>;
