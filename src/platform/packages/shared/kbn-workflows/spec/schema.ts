@@ -52,6 +52,7 @@ const BaseStepSchema: z.ZodType<any> = z.lazy(() =>
       AtomicStepSchema,
       ParallelStepSchema,
       MergeStepSchema,
+      ConnectorStepSchema,
       // ...other step types
     ]),
     with: z.record(z.string(), z.any()).optional(),
@@ -62,6 +63,13 @@ const BaseStepSchema: z.ZodType<any> = z.lazy(() =>
     timeout: z.number().optional(),
   })
 );
+
+const ConnectorStepSchema = z.object({
+  type: z.string(),
+  name: z.string(),
+  connectorId: z.optional(z.string()), // http.request for example, doesn't need connectorId
+  // steps: z.array(BaseStepSchema), // TODO: do we need this?
+});
 
 
 const ForEachStepSchema = z.object({
