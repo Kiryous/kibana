@@ -6,19 +6,27 @@ import { PluginStartContract as ActionsPluginStartContract } from '@kbn/actions-
 import { v4 as generateUuid } from 'uuid';
 import { WorkflowsExecutionEnginePluginStart } from '@kbn/workflows-execution-engine/server';
 import { workflowsGrouppedByTriggerType } from '../mock';
+import { IUnsecuredActionsClient } from '@kbn/actions-plugin/server';
 
 const findWorkflowsByTrigger = (triggerType: string): WorkflowExecutionEngineModel[] => {
   return workflowsGrouppedByTriggerType[triggerType] || [];
 };
 
 export class SchedulerService {
+  private readonly logger: Logger;
+  private readonly workflowsService: WorkflowsService;
+  private readonly actionsClient: IUnsecuredActionsClient;
+  private readonly workflowsExecutionEngine: WorkflowsExecutionEnginePluginStart;
+
   constructor(
-    private readonly logger: Logger,
-    private readonly workflowsService: WorkflowsService,
-    private readonly actions: ActionsPluginStartContract,
-    private readonly workflowsExecutionEngine: WorkflowsExecutionEnginePluginStart
+    logger: Logger,
+    workflowsService: WorkflowsService,
+    actionsClient: IUnsecuredActionsClient,
+    workflowsExecutionEngine: WorkflowsExecutionEnginePluginStart
   ) {
-    this.actions = actions;
+    this.logger = logger;
+    this.workflowsService = workflowsService;
+    this.actionsClient = actionsClient;
     this.workflowsExecutionEngine = workflowsExecutionEngine;
   }
 
@@ -45,7 +53,7 @@ export class SchedulerService {
     workflow: WorkflowExecutionEngineModel,
     inputs: Record<string, any>
   ): Promise<string> {
-    const connectorCredentials = await extractConnectorIds(workflow, this.actions);
+    const connectorCredentials = await extractConnectorIds(workflow, this.actionsClient);
 
     const workflowRunId = generateUuid();
     this.workflowsExecutionEngine.executeWorkflow(workflow, {

@@ -1,15 +1,15 @@
 import { WorkflowExecutionEngineModel } from '@kbn/workflows';
-import { PluginStartContract as ActionsPluginStartContract } from '@kbn/actions-plugin/server/plugin';
+import { IUnsecuredActionsClient } from '@kbn/actions-plugin/server';
 
 export const extractConnectorIds = async (
   workflow: WorkflowExecutionEngineModel,
-  actions: ActionsPluginStartContract
+  actionsClient: IUnsecuredActionsClient
 ): Promise<Record<string, Record<string, any>>> => {
   const connectorNames = workflow.steps
     .filter((step) => step.connectorType.endsWith('-connector'))
     .map((step) => step.connectorName);
   const distinctConnectorNames = Array.from(new Set(connectorNames));
-  const allConnectors = await actions.getUnsecuredActionsClient().getAll('default');
+  const allConnectors = await actionsClient.getAll('default');
   const connectorNameIdMap = new Map<string, string>(
     allConnectors.map((connector) => [connector.name, connector.id])
   );

@@ -12,10 +12,13 @@ import { WorkflowsService } from './workflows_management/workflows_management_se
 import { Client } from '@elastic/elasticsearch';
 import type { WorkflowsExecutionEnginePluginStartDeps } from './types';
 import { SchedulerService } from './scheduler/scheduler_service';
+import { IUnsecuredActionsClient } from '@kbn/actions-plugin/server';
 
 export class WorkflowsPlugin implements Plugin<WorkflowsPluginSetup, WorkflowsPluginStart> {
   private readonly logger: Logger;
   private workflowsService: WorkflowsService | null = null;
+  private schedulerService: SchedulerService | null = null;
+  private unsecureActionsClient: IUnsecuredActionsClient | null = null;
   // TODO: replace with esClient promise from core
   private esClient: Client = new Client({
     node: 'http://localhost:9200', // or your ES URL
@@ -30,8 +33,12 @@ export class WorkflowsPlugin implements Plugin<WorkflowsPluginSetup, WorkflowsPl
   }
 
   public setup(core: CoreSetup) {
-    this.logger.info('Workflows Management: Setup');
+    this.logger.debug('Workflows Management: Setup');
+
+    this.logger.debug('Workflows Management: Creating router');
     const router = core.http.createRouter();
+
+    this.logger.debug('Workflows Management: Creating workflows service');
     this.workflowsService = new WorkflowsService(
       Promise.resolve(this.esClient),
       this.logger,
@@ -48,16 +55,19 @@ export class WorkflowsPlugin implements Plugin<WorkflowsPluginSetup, WorkflowsPl
   }
 
   public start(core: CoreStart, plugins: WorkflowsExecutionEnginePluginStartDeps) {
-    this.logger.debug('workflows: Start');
+    this.logger.debug('Workflows Management: Start');
 
-    const schedulerService = new SchedulerService(
+    this.unsecureActionsClient = plugins.actions.getUnsecuredActionsClient();
+
+    this.logger.debug('Workflows Management: Creating scheduler service');
+    this.schedulerService = new SchedulerService(
       this.logger,
       this.workflowsService!,
-      plugins.actions,
+      this.unsecureActionsClient!,
       plugins.workflowsExecutionEngine
     );
 
-    this.logger.debug('workflows: Started');
+    this.logger.debug('Workflows Management: Started');
 
     // TODO: REMOVE THIS AFTER TESTING
     // Simulate pushing events every 10 seconds for testing purposes
@@ -79,8 +89,8 @@ export class WorkflowsPlugin implements Plugin<WorkflowsPluginSetup, WorkflowsPl
 
     return {
       // TODO: use api abstraction instead of schedulerService methods directly
-      pushEvent: schedulerService.pushEvent,
-      runWorkflow: schedulerService.runWorkflow,
+      pushEvent: this.schedulerService!.pushEvent.bind(this.schedulerService),
+      runWorkflow: this.schedulerService!.runWorkflow.bind(this.schedulerService),
     };
   }
 
