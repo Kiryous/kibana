@@ -112,7 +112,6 @@ const MergeStepSchema = z.object({
   steps: z.array(BaseStepSchema), // steps to run after merge
 });
 
-
 /* --- Inputs --- */
 export const WorkflowInputTypeEnum = z.enum(['string', 'number', 'boolean', 'choice']);
 
