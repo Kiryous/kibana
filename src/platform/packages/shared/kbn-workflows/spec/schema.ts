@@ -1,5 +1,21 @@
 import { z } from 'zod';
 
+/* -- Settings -- */
+export const RetryPolicySchema = z.object({
+  maxAttempts: z.number().int().min(1).optional(),
+  timeoutSeconds: z.number().int().min(1).optional(),
+});
+
+export const TemplatingOptionsSchema = z.object({
+  engine: z.enum(['mustache', 'nunjucks']),
+});
+
+export const WorkflowSettingsSchema = z.object({
+  retry: RetryPolicySchema.optional(),
+  templating: TemplatingOptionsSchema.optional(),
+  timezone: z.string().optional(), // Should follow IANA TZ format
+});
+
 /* --- Triggers --- */
 export const DetectionRuleTriggerSchema = z.object({
   type: z.literal('triggers.elastic.detectionRule'),
@@ -168,6 +184,7 @@ export const WorkflowConstsSchema = z.record(
 export const WorkflowSchema = z.object({
   name: z.string().min(1),
   description: z.string().optional(),
+  settings: WorkflowSettingsSchema.optional(),
   enabled: z.boolean().default(true),
   triggers: z.array(TriggerSchema).min(1),
   inputs: z.array(WorkflowInputSchema).optional(),
