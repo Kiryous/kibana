@@ -63,19 +63,6 @@ export class WorkflowsPlugin implements Plugin<WorkflowsPluginSetup, WorkflowsPl
   public setup(core: CoreSetup, plugins: WorkflowsManagementPluginServerDependenciesSetup) {
     this.logger.debug('Workflows Management: Setup');
 
-    this.logger.debug('Workflows Management: Creating router');
-    const router = core.http.createRouter();
-
-    this.logger.debug('Workflows Management: Creating workflows service');
-    this.workflowsService = new WorkflowsService(
-      Promise.resolve(this.esClient),
-      this.logger,
-      WORKFLOWS_INDEX,
-      WORKFLOWS_EXECUTIONS_INDEX,
-      WORKFLOWS_STEP_EXECUTIONS_INDEX
-    );
-    this.api = new WorkflowsManagementApi(this.workflowsService);
-
     plugins.features?.registerKibanaFeature({
       id: 'workflowsManagement',
       name: i18n.translate(
@@ -231,6 +218,19 @@ export class WorkflowsPlugin implements Plugin<WorkflowsPluginSetup, WorkflowsPl
         },
       ],
     });
+
+    this.logger.debug('Workflows Management: Creating router');
+    const router = core.http.createRouter();
+
+    this.logger.debug('Workflows Management: Creating workflows service');
+    this.workflowsService = new WorkflowsService(
+      Promise.resolve(this.esClient),
+      this.logger,
+      WORKFLOWS_INDEX,
+      WORKFLOWS_EXECUTIONS_INDEX,
+      WORKFLOWS_STEP_EXECUTIONS_INDEX
+    );
+    this.api = new WorkflowsManagementApi(this.workflowsService);
 
     // Register server side APIs
     defineRoutes(router, this.api);

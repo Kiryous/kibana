@@ -16,7 +16,7 @@ import { WorkflowExecutionEngineModel } from '@kbn/workflows';
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface WorkflowsPluginSetup {}
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
+
 export interface WorkflowsPluginStart {
   runWorkflow(workflow: WorkflowExecutionEngineModel, params: Record<string, any>): Promise<string>;
 }
