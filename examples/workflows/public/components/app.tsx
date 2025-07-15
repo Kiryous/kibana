@@ -203,6 +203,10 @@ export const WorkflowsApp = ({ basename, notifications, http, navigation }: Work
                       onChange={setWorkflowInputs}
                       suggestionProvider={undefined}
                       dataTestSubj={'workflow-inputs-json-editor'}
+                      readOnlyMessage='You cannot edit the event sent to the workflow.'
+                      options={{
+                        readOnly: true,
+                      }}
                     />
                   </div>
                 </EuiFlexItem>
