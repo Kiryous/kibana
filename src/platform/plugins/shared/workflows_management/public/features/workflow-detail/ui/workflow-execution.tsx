@@ -116,19 +116,20 @@ export const WorkflowExecution: React.FC<WorkflowExecutionProps> = ({
           </EuiFlexGroup>
         )}
         {workflowExecution?.startedAt && (
-          <p>
-            <strong>Started At:</strong> {workflowExecution?.startedAt?.toLocaleString()}
-          </p>
+          <div>
+            <strong>Started At:</strong>
+            {workflowExecution?.startedAt?.toLocaleString()}
+          </div>
         )}
         {workflowExecution?.finishedAt && (
-          <p>
+          <div>
             <strong>Finished At:</strong> {workflowExecution?.finishedAt?.toLocaleString()}
-          </p>
+          </div>
         )}
-        {workflowExecution?.duration && (
-          <p>
+        {workflowExecution?.duration !== undefined && (
+          <div>
             <strong>Duration:</strong> {workflowExecution?.duration} ms
-          </p>
+          </div>
         )}
       </EuiText>
       <EuiBasicTable
