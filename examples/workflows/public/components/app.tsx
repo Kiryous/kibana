@@ -88,7 +88,7 @@ export const WorkflowsApp = ({ basename, notifications, http, navigation }: Work
             connectorName: 'slack_keep',
             inputs: {
               message:
-                'Message from step 1: Detection rule name is "{{event.ruleName}}" and user is "{{event.additionalData.userName}}" and workflowRunId is "{{workflowRunId}}"',
+                'Message from step 1: Detection rule name is "{{event.ruleName}}" and user is "{{event.additionalData.userName}}" and workflowRunId is "{{workflowRunId}}" and time now is {{ now() }}',
             },
           },
           {
@@ -97,7 +97,8 @@ export const WorkflowsApp = ({ basename, notifications, http, navigation }: Work
             connectorName: 'console',
             connectorType: 'console',
             inputs: {
-              message: 'Step 2 executed!',
+              message:
+                'Message from step 2: And this is the second step at {{ now() }}',
             },
           },
           {
