@@ -23,3 +23,11 @@ export const WorkflowSchema = z.object({
   triggers: z.array(WorkflowTriggerSchema),
   steps: z.array(WorkflowStepSchema),
 });
+
+export const CreateWorkflowRequestSchema = z.object({
+  name: z.string(),
+  description: z.string().optional(),
+  status: z.nativeEnum(WorkflowStatus).optional(),
+  triggers: z.array(WorkflowTriggerSchema).optional(),
+  steps: z.array(WorkflowStepSchema).optional(),
+});

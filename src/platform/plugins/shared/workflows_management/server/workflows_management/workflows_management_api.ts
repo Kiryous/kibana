@@ -7,8 +7,9 @@
  * License v3.0 only", or the "Server Side Public License, v 1".
  */
 
-import { WorkflowListModel, WorkflowModel } from '@kbn/workflows';
+import { CreateWorkflowRequest, WorkflowListModel, WorkflowModel } from '@kbn/workflows';
 import { WorkflowsService } from './workflows_management_service';
+import { SchedulerService } from '../scheduler/scheduler_service';
 
 export interface GetWorkflowsParams {
   triggerType?: 'schedule' | 'event';
@@ -18,7 +19,14 @@ export interface GetWorkflowsParams {
 }
 
 export class WorkflowsManagementApi {
-  constructor(private readonly workflowsService: WorkflowsService) {}
+  constructor(
+    private readonly workflowsService: WorkflowsService,
+    private schedulerService: SchedulerService | null = null
+  ) {}
+
+  public setSchedulerService(schedulerService: SchedulerService) {
+    this.schedulerService = schedulerService;
+  }
 
   public async getWorkflows(params: GetWorkflowsParams): Promise<WorkflowListModel> {
     return await this.workflowsService.searchWorkflows(params);
@@ -28,11 +36,25 @@ export class WorkflowsManagementApi {
     return await this.workflowsService.getWorkflow(id);
   }
 
-  public async createWorkflow(workflow: WorkflowModel): Promise<WorkflowModel> {
+  public async createWorkflow(workflow: CreateWorkflowRequest): Promise<WorkflowModel> {
     return await this.workflowsService.createWorkflow(workflow);
   }
 
-  public async updateWorkflow(id: string, workflow: WorkflowModel): Promise<WorkflowModel> {
+  public async updateWorkflow(
+    id: string,
+    workflow: Partial<WorkflowModel>
+  ): Promise<WorkflowModel> {
     return await this.workflowsService.updateWorkflow(id, workflow);
+  }
+
+  public async deleteWorkflows(workflowIds: string[]): Promise<void> {
+    return await this.workflowsService.deleteWorkflows(workflowIds);
+  }
+
+  public async runWorkflow(workflow: WorkflowModel, inputs: Record<string, any>): Promise<string> {
+    if (!this.schedulerService) {
+      throw new Error('Scheduler service not set');
+    }
+    return await this.schedulerService.runWorkflow(workflow, inputs);
   }
 }

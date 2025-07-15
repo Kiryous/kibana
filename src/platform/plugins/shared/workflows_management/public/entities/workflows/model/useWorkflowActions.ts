@@ -39,8 +39,31 @@ export function useWorkflowActions() {
     },
   });
 
+  const deleteWorkflows = useMutation({
+    mutationKey: ['DELETE', 'workflows'],
+    mutationFn: ({ ids }: { ids: string[] }) => {
+      return http!.delete(`/api/workflows`, {
+        body: JSON.stringify({ ids }),
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['workflows'] });
+    },
+  });
+
+  const runWorkflow = useMutation({
+    mutationKey: ['POST', 'workflows', 'run'],
+    mutationFn: ({ id, inputs }: { id: string; inputs: Record<string, any> }) => {
+      return http!.post(`/api/workflows/${id}/run`, {
+        body: JSON.stringify({ inputs }),
+      });
+    },
+  });
+
   return {
     createWorkflow,
-    updateWorkflow,
+    updateWorkflow, // kc: maybe return mutation.mutate? where the navigation is handled?
+    deleteWorkflows,
+    runWorkflow,
   };
 }

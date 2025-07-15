@@ -1,13 +1,22 @@
+/*
+ * Copyright Elasticsearch B.V. and/or licensed to Elasticsearch B.V. under one
+ * or more contributor license agreements. Licensed under the "Elastic License
+ * 2.0", the "GNU Affero General Public License v3.0 only", and the "Server Side
+ * Public License v 1"; you may not use this file except in compliance with, at
+ * your election, the "Elastic License 2.0", the "GNU Affero General Public
+ * License v3.0 only", or the "Server Side Public License, v 1".
+ */
+
 import { SearchResponse } from '@elastic/elasticsearch/lib/api/types';
 import { ElasticsearchClient, Logger } from '@kbn/core/server';
 import { EsWorkflowSchema, WorkflowListModel } from '@kbn/workflows';
 
-type SearchWorkflowsParams = {
+interface SearchWorkflowsParams {
   esClient: ElasticsearchClient;
   logger: Logger;
   workflowIndex: string;
   _full?: boolean;
-};
+}
 
 export const searchWorkflows = async ({
   esClient,
@@ -42,7 +51,6 @@ function transformToWorkflowListModel(
 ): WorkflowListModel {
   return {
     results: response.hits.hits.map((hit) => {
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       const workflowSchema = hit._source!;
       return {
         id: hit._id!,
@@ -72,7 +80,6 @@ function transformToWorkflowListItemModel(
   response: SearchResponse<EsWorkflowSchema>
 ): WorkflowListModel {
   const workflows = response.hits.hits.map((hit) => {
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const workflowSchema = hit._source!;
     return {
       id: hit._id,

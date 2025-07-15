@@ -16,7 +16,7 @@ interface UpdateWorkflowParams {
   logger: Logger;
   workflowIndex: string;
   workflowId: string;
-  workflow: WorkflowModel;
+  workflow: Partial<WorkflowModel>;
 }
 
 export const updateWorkflow = async ({
@@ -50,11 +50,8 @@ export const updateWorkflow = async ({
   }
 };
 
-function transformToUpdateScheme(workflow: WorkflowModel) {
+function transformToUpdateScheme(workflow: Partial<WorkflowModel>) {
   return {
-    id: workflow.id,
-    name: workflow.name,
-    description: workflow.description,
-    steps: workflow.steps,
+    ...workflow,
   };
 }

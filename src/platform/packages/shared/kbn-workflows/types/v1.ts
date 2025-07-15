@@ -1,3 +1,12 @@
+/*
+ * Copyright Elasticsearch B.V. and/or licensed to Elasticsearch B.V. under one
+ * or more contributor license agreements. Licensed under the "Elastic License
+ * 2.0", the "GNU Affero General Public License v3.0 only", and the "Server Side
+ * Public License v 1"; you may not use this file except in compliance with, at
+ * your election, the "Elastic License 2.0", the "GNU Affero General Public
+ * License v3.0 only", or the "Server Side Public License, v 1".
+ */
+
 export enum ExecutionStatus {
   // In progress
   PENDING = 'pending',
@@ -54,6 +63,7 @@ export interface WorkflowStepExecution {
 }
 
 export enum WorkflowStatus {
+  DRAFT = 'draft',
   ACTIVE = 'active',
   INACTIVE = 'inactive',
   DELETED = 'deleted',
@@ -121,6 +131,14 @@ export interface EsWorkflowSchema {
   yaml: string;
   steps: WorkflowStep[];
   nodes: WorkflowNode[];
+}
+
+export interface CreateWorkflowRequest {
+  name: string;
+  description?: string;
+  status?: WorkflowStatus;
+  triggers?: WorkflowTrigger[];
+  steps?: WorkflowStep[];
 }
 
 export type WorkflowModel = EsWorkflowSchema;

@@ -8,12 +8,13 @@
  */
 
 import { ElasticsearchClient, Logger } from '@kbn/core/server';
-import { WorkflowListModel, WorkflowModel } from '@kbn/workflows';
+import { CreateWorkflowRequest, WorkflowListModel, WorkflowModel } from '@kbn/workflows';
 import { getWorkflow } from './lib/get_workflow';
 import { createWorkflow } from './lib/create_workflow';
 import { GetWorkflowsParams } from './workflows_management_api';
 import { searchWorkflows } from './lib/search_workflows';
 import { updateWorkflow } from './lib/update_workflow';
+import { deleteWorkflows } from './lib/delete_workflows';
 
 export class WorkflowsService {
   private esClient: ElasticsearchClient | null = null;
@@ -50,6 +51,7 @@ export class WorkflowsService {
     if (!this.esClient) {
       throw new Error('Elasticsearch client not initialized');
     }
+    console.log('searchWorkflows aaaaa', params);
     return await searchWorkflows({
       esClient: this.esClient,
       logger: this.logger,
@@ -70,7 +72,7 @@ export class WorkflowsService {
     });
   }
 
-  public async createWorkflow(workflow: WorkflowModel): Promise<WorkflowModel> {
+  public async createWorkflow(workflow: CreateWorkflowRequest): Promise<WorkflowModel> {
     if (!this.esClient) {
       throw new Error('Elasticsearch client not initialized');
     }
@@ -82,7 +84,10 @@ export class WorkflowsService {
     });
   }
 
-  public async updateWorkflow(id: string, workflow: WorkflowModel): Promise<WorkflowModel> {
+  public async updateWorkflow(
+    id: string,
+    workflow: Partial<WorkflowModel>
+  ): Promise<WorkflowModel> {
     if (!this.esClient) {
       throw new Error('Elasticsearch client not initialized');
     }
@@ -92,6 +97,18 @@ export class WorkflowsService {
       workflowIndex: this.workflowIndex,
       workflowId: id,
       workflow,
+    });
+  }
+
+  public async deleteWorkflows(workflowIds: string[]): Promise<void> {
+    if (!this.esClient) {
+      throw new Error('Elasticsearch client not initialized');
+    }
+    return await deleteWorkflows({
+      esClient: this.esClient,
+      logger: this.logger,
+      workflowIndex: this.workflowIndex,
+      workflowIds,
     });
   }
 }

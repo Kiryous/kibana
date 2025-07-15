@@ -1,3 +1,12 @@
+/*
+ * Copyright Elasticsearch B.V. and/or licensed to Elasticsearch B.V. under one
+ * or more contributor license agreements. Licensed under the "Elastic License
+ * 2.0", the "GNU Affero General Public License v3.0 only", and the "Server Side
+ * Public License v 1"; you may not use this file except in compliance with, at
+ * your election, the "Elastic License 2.0", the "GNU Affero General Public
+ * License v3.0 only", or the "Server Side Public License, v 1".
+ */
+
 import type {
   PluginInitializerContext,
   CoreSetup,
@@ -5,20 +14,22 @@ import type {
   Plugin,
   Logger,
 } from '@kbn/core/server';
+import { Client } from '@elastic/elasticsearch';
+import { IUnsecuredActionsClient } from '@kbn/actions-plugin/server';
 import type { WorkflowsPluginSetup, WorkflowsPluginStart } from './types';
 import { defineRoutes } from './workflows_management/workflows_management_routes';
 import { WorkflowsManagementApi } from './workflows_management/workflows_management_api';
 import { WorkflowsService } from './workflows_management/workflows_management_service';
-import { Client } from '@elastic/elasticsearch';
 import type { WorkflowsExecutionEnginePluginStartDeps } from './types';
 import { SchedulerService } from './scheduler/scheduler_service';
-import { IUnsecuredActionsClient } from '@kbn/actions-plugin/server';
+import { WORKFLOWS_INDEX } from '../common';
 
 export class WorkflowsPlugin implements Plugin<WorkflowsPluginSetup, WorkflowsPluginStart> {
   private readonly logger: Logger;
   private workflowsService: WorkflowsService | null = null;
   private schedulerService: SchedulerService | null = null;
   private unsecureActionsClient: IUnsecuredActionsClient | null = null;
+  private api: WorkflowsManagementApi | null = null;
   // TODO: replace with esClient promise from core
   private esClient: Client = new Client({
     node: 'http://localhost:9200', // or your ES URL
@@ -42,15 +53,15 @@ export class WorkflowsPlugin implements Plugin<WorkflowsPluginSetup, WorkflowsPl
     this.workflowsService = new WorkflowsService(
       Promise.resolve(this.esClient),
       this.logger,
-      '.workflows'
+      WORKFLOWS_INDEX
     );
-    const api = new WorkflowsManagementApi(this.workflowsService);
+    this.api = new WorkflowsManagementApi(this.workflowsService);
 
     // Register server side APIs
-    defineRoutes(router, api);
+    defineRoutes(router, this.api);
 
     return {
-      management: api,
+      management: this.api,
     };
   }
 
@@ -66,6 +77,7 @@ export class WorkflowsPlugin implements Plugin<WorkflowsPluginSetup, WorkflowsPl
       this.unsecureActionsClient!,
       plugins.workflowsExecutionEngine
     );
+    this.api!.setSchedulerService(this.schedulerService!);
 
     this.logger.debug('Workflows Management: Started');
 

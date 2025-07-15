@@ -9,3 +9,5 @@
 
 export const PLUGIN_ID = 'workflows';
 export const PLUGIN_NAME = 'Workflows';
+
+export const WORKFLOWS_INDEX = '.workflows';
