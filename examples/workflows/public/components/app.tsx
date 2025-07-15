@@ -97,8 +97,7 @@ export const WorkflowsApp = ({ basename, notifications, http, navigation }: Work
             connectorName: 'console',
             connectorType: 'console',
             inputs: {
-              message:
-                'Message from step 2: And this is the second step at {{ now() }}',
+              message: 'Message from step 2: And this is the second step at {{ now() }}',
             },
           },
           {
@@ -126,7 +125,7 @@ export const WorkflowsApp = ({ basename, notifications, http, navigation }: Work
           ruleName: 'Detect vulnerabilities',
           additionalData: {
             user: userEmail,
-            userName: userName,
+            userName,
           },
         },
       },
