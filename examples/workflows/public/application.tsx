@@ -9,18 +9,18 @@ import { WorkflowsApp } from './components/app';
 const queryClient = new QueryClient();
 
 export const renderApp = (
-  { notifications, http, chrome, application }: CoreStart,
-  { navigation }: AppPluginStartDependencies,
+  coreStart: CoreStart,
+  depsStart: AppPluginStartDependencies,
   { appBasePath, element }: AppMountParameters
 ) => {
   ReactDOM.render(
-    <KibanaContextProvider services={{ notifications, http, chrome, application }}>
+    <KibanaContextProvider services={{ ...coreStart, ...depsStart }}>
       <QueryClientProvider client={queryClient}>
         <WorkflowsApp
           basename={appBasePath}
-          notifications={notifications}
-          http={http}
-          navigation={navigation}
+          notifications={coreStart.notifications}
+          http={coreStart.http}
+          navigation={depsStart.navigation}
         />
       </QueryClientProvider>
     </KibanaContextProvider>,
