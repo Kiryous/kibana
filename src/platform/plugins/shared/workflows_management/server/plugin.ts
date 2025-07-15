@@ -281,6 +281,162 @@ export class WorkflowsPlugin implements Plugin<WorkflowsPluginSetup, WorkflowsPl
     );
     this.api = new WorkflowsManagementApi(this.workflowsService);
 
+    plugins.features?.registerKibanaFeature({
+      id: 'workflowsManagement',
+      name: i18n.translate(
+        'platform.plugins.shared.workflows_management.featureRegistry.workflowsManagementFeatureName',
+        {
+          defaultMessage: 'Workflows Management',
+        }
+      ),
+      category: DEFAULT_APP_CATEGORIES.management,
+      scope: [KibanaFeatureScope.Spaces, KibanaFeatureScope.Security],
+      app: [],
+      order: FEATURE_ORDER,
+      management: {
+        kibana: ['workflowsManagement'],
+      },
+      privileges: {
+        all: {
+          app: [],
+          api: [],
+          management: {
+            kibana: ['workflowsManagement'],
+          },
+          savedObject: {
+            all: ['workflows', 'workflow_executions'],
+            read: [],
+          },
+          ui: ['create', 'update', 'delete', 'read', 'execute'],
+        },
+        read: {
+          app: [],
+          api: [],
+          management: {
+            kibana: ['workflowsManagement'],
+          },
+          savedObject: {
+            all: [],
+            read: ['workflows', 'workflow_executions'],
+          },
+          ui: ['read'],
+        },
+      },
+      subFeatures: [
+        {
+          name: i18n.translate(
+            'platform.plugins.shared.workflows_management.featureRegistry.workflowsManagementSubFeatureName',
+            {
+              defaultMessage: 'Workflows Actions',
+            }
+          ),
+          privilegeGroups: [
+            {
+              groupType: 'independent',
+              privileges: [
+                {
+                  api: ['workflow:create'],
+                  id: 'workflow_create',
+                  name: i18n.translate(
+                    'platform.plugins.shared.workflows_management.featureRegistry.createWorkflowSubFeaturePrivilege',
+                    {
+                      defaultMessage: 'Create',
+                    }
+                  ),
+                  includeIn: 'all',
+                  savedObject: {
+                    all: ['workflow'],
+                    read: [],
+                  },
+                  ui: ['createWorkflow'],
+                },
+                {
+                  api: ['workflow:update'],
+                  id: 'workflow_update',
+                  name: i18n.translate(
+                    'platform.plugins.shared.workflows_management.featureRegistry.updateWorkflowSubFeaturePrivilege',
+                    {
+                      defaultMessage: 'Update',
+                    }
+                  ),
+                  includeIn: 'all',
+                  savedObject: {
+                    all: ['workflow'],
+                    read: [],
+                  },
+                  ui: ['updateWorkflow'],
+                },
+                {
+                  api: ['workflow:delete'],
+                  id: 'workflow_delete',
+                  name: i18n.translate(
+                    'platform.plugins.shared.workflows_management.featureRegistry.deleteWorkflowSubFeaturePrivilege',
+                    {
+                      defaultMessage: 'Delete',
+                    }
+                  ),
+                  includeIn: 'all',
+                  savedObject: {
+                    all: ['workflow'],
+                    read: [],
+                  },
+                  ui: ['deleteWorkflow'],
+                },
+                {
+                  api: ['workflow:execute'],
+                  id: 'workflow_execute',
+                  name: i18n.translate(
+                    'platform.plugins.shared.workflows_management.featureRegistry.executeWorkflowSubFeaturePrivilege',
+                    {
+                      defaultMessage: 'Execute',
+                    }
+                  ),
+                  includeIn: 'all',
+                  savedObject: {
+                    all: ['workflow_execution'],
+                    read: ['workflow'],
+                  },
+                  ui: ['executeWorkflow'],
+                },
+                {
+                  api: ['workflow:read'],
+                  id: 'workflow_read',
+                  name: i18n.translate(
+                    'platform.plugins.shared.workflows_management.featureRegistry.readWorkflowSubFeaturePrivilege',
+                    {
+                      defaultMessage: 'Read',
+                    }
+                  ),
+                  includeIn: 'all',
+                  savedObject: {
+                    read: ['workflow'],
+                    all: [],
+                  },
+                  ui: ['readWorkflow'],
+                },
+                {
+                  api: ['workflow_execution:read'],
+                  id: 'workflow_execution_read',
+                  name: i18n.translate(
+                    'platform.plugins.shared.workflows_management.featureRegistry.readWorkflowExecutionSubFeaturePrivilege',
+                    {
+                      defaultMessage: 'Read Workflow Execution',
+                    }
+                  ),
+                  includeIn: 'all',
+                  savedObject: {
+                    read: ['workflow_execution'],
+                    all: [],
+                  },
+                  ui: ['readWorkflowExecution'],
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    });
+
     // Register server side APIs
     defineRoutes(router, this.api);
 
