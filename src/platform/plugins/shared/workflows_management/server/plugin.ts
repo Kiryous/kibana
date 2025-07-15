@@ -22,7 +22,13 @@ import { WorkflowsManagementApi } from './workflows_management/workflows_managem
 import { WorkflowsService } from './workflows_management/workflows_management_service';
 import type { WorkflowsExecutionEnginePluginStartDeps } from './types';
 import { SchedulerService } from './scheduler/scheduler_service';
-import { WORKFLOWS_INDEX } from '../common';
+import {
+  WORKFLOWS_EXECU,
+  WORKFLOWS_STEP_EXECUTIONS_INDEXTIONS_INDEX,
+  WORKFLOWS_INDEX,
+  WORKFLOWS_EXECUTIONS_INDEX,
+  WORKFLOWS_STEP_EXECUTIONS_INDEX,
+} from '../common';
 
 export class WorkflowsPlugin implements Plugin<WorkflowsPluginSetup, WorkflowsPluginStart> {
   private readonly logger: Logger;
@@ -53,7 +59,9 @@ export class WorkflowsPlugin implements Plugin<WorkflowsPluginSetup, WorkflowsPl
     this.workflowsService = new WorkflowsService(
       Promise.resolve(this.esClient),
       this.logger,
-      WORKFLOWS_INDEX
+      WORKFLOWS_INDEX,
+      WORKFLOWS_EXECUTIONS_INDEX,
+      WORKFLOWS_STEP_EXECUTIONS_INDEX
     );
     this.api = new WorkflowsManagementApi(this.workflowsService);
 

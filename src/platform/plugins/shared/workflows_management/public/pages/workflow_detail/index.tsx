@@ -15,7 +15,6 @@ import {
   EuiFlexGroup,
   EuiFlexItem,
   EuiLoadingSpinner,
-  EuiPageHeader,
   EuiPageTemplate,
   EuiText,
 } from '@elastic/eui';
@@ -25,9 +24,10 @@ import { FormattedMessage } from '@kbn/i18n-react';
 import { useWorkflowDetail } from '../../entities/workflows/model/useWorkflowDetail';
 import { WorkflowEditor } from '../../features/workflow-editor/ui';
 import { useWorkflowActions } from '../../entities/workflows/model/useWorkflowActions';
+import { WorkflowExecutionList } from '../../features/workflow-execution-list/ui';
 
 export function WorkflowDetailPage({ id }: { id: string }) {
-  const { application, chrome } = useKibana().services;
+  const { application, chrome, notifications } = useKibana().services;
   const { data: workflow, isLoading: isLoadingWorkflow, error } = useWorkflowDetail(id);
 
   chrome!.setBreadcrumbs([
@@ -36,6 +36,11 @@ export function WorkflowDetailPage({ id }: { id: string }) {
       href: application!.getUrlForApp('workflows', { path: '/' }),
     },
     { text: workflow?.name ?? 'Workflow Detail' },
+  ]);
+
+  chrome!.docTitle.change([
+    workflow?.name ?? 'Workflow Detail',
+    i18n.translate('workflows.breadcrumbs.title', { defaultMessage: 'Workflows' }),
   ]);
 
   const [workflowJson, setWorkflowJson] = useState(JSON.stringify(workflow, null, 2));
@@ -57,7 +62,7 @@ export function WorkflowDetailPage({ id }: { id: string }) {
     setButtonGroupSelectedId(buttonGroupId);
   };
 
-  const { updateWorkflow } = useWorkflowActions();
+  const { updateWorkflow, runWorkflow } = useWorkflowActions();
 
   const handleSave = () => {
     updateWorkflow.mutate({
@@ -66,8 +71,23 @@ export function WorkflowDetailPage({ id }: { id: string }) {
     });
   };
 
-  const handleRun = () => {
-    console.log('run');
+  const handleRunWorkflow = () => {
+    runWorkflow.mutate(
+      { id, inputs: {} },
+      {
+        onSuccess: () => {
+          notifications?.toasts.addSuccess('Workflow run started', {
+            toastLifeTimeMs: 3000,
+          });
+        },
+        onError: (error: unknown) => {
+          notifications?.toasts.addError(error, {
+            toastLifeTimeMs: 3000,
+            title: 'Failed to run workflow',
+          });
+        },
+      }
+    );
   };
 
   const buttonGroupOptions: EuiButtonGroupOptionProps[] = useMemo(
@@ -86,6 +106,20 @@ export function WorkflowDetailPage({ id }: { id: string }) {
     []
   );
 
+  const renderWorkflowEditor = () => {
+    if (workflow === undefined) {
+      <EuiText>Failed to load workflow</EuiText>;
+    }
+    return <WorkflowEditor value={workflowJson} onChange={handleChange} hasChanges={hasChanges} />;
+  };
+
+  const renderWorkflowExecutions = () => {
+    if (workflow === undefined) {
+      return <EuiText>Failed to load workflow</EuiText>;
+    }
+    return <WorkflowExecutionList workflowId={workflow?.id} />;
+  };
+
   if (isLoadingWorkflow) {
     return <EuiLoadingSpinner />;
   }
@@ -103,7 +137,7 @@ export function WorkflowDetailPage({ id }: { id: string }) {
           <EuiButton color="text" size="s" onClick={handleSave} disabled={!hasChanges}>
             <FormattedMessage id="keepWorkflows.buttonText" defaultMessage="Save" ignoreTag />
           </EuiButton>,
-          <EuiButton iconType="play" size="s" onClick={handleRun}>
+          <EuiButton iconType="play" size="s" onClick={handleRunWorkflow}>
             <FormattedMessage id="keepWorkflows.buttonText" defaultMessage="Run" ignoreTag />
           </EuiButton>,
         ]}
@@ -122,11 +156,7 @@ export function WorkflowDetailPage({ id }: { id: string }) {
         </EuiFlexGroup>
       </EuiPageTemplate.Header>
       <EuiPageTemplate.Section restrictWidth={false}>
-        {workflow === undefined ? (
-          <EuiText>Failed to load workflow</EuiText>
-        ) : (
-          <WorkflowEditor value={workflowJson} onChange={handleChange} hasChanges={hasChanges} />
-        )}
+        {buttonGroupSelectedId === 'workflow' ? renderWorkflowEditor() : renderWorkflowExecutions()}
       </EuiPageTemplate.Section>
     </EuiPageTemplate>
   );

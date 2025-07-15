@@ -7,6 +7,7 @@ import type {
 } from '@kbn/core/server';
 import {
   ExecutionStatus,
+  WorkflowExecution,
   WorkflowExecutionEngineModel,
   WorkflowStepExecution,
 } from '@kbn/workflows';
@@ -23,6 +24,7 @@ import { StepRunner } from './step-runner/step-runner';
 import { TemplatingEngine } from './templating-engine';
 
 import { ConnectorExecutor } from './connector-executor';
+import { WORKFLOWS_EXECUTIONS_INDEX, WORKFLOWS_STEP_EXECUTIONS_INDEX } from '../common';
 
 export class WorkflowsExecutionEnginePlugin
   implements Plugin<WorkflowsExecutionEnginePluginSetup, WorkflowsExecutionEnginePluginStart>
@@ -53,7 +55,24 @@ export class WorkflowsExecutionEnginePlugin
       workflow: WorkflowExecutionEngineModel,
       context: Record<string, any>
     ) => {
-      const workflowRunId = context['workflowRunId'];
+      const workflowRunId = context.workflowRunId;
+      const workflowCreatedAt = new Date();
+      const workflowStartedAt = new Date();
+      await this.esClient.index({
+        index: WORKFLOWS_EXECUTIONS_INDEX,
+        id: workflowRunId,
+        refresh: true,
+        document: {
+          workflowId: workflow.id,
+          id: workflowRunId,
+          triggers: workflow.triggers,
+          steps: workflow.steps,
+          status: ExecutionStatus.RUNNING,
+          createdAt: workflowCreatedAt,
+          startedAt: workflowStartedAt,
+        } as WorkflowExecution,
+      });
+
       const stepRunner = new StepRunner(
         new ConnectorExecutor(
           context.connectorCredentials,
@@ -73,7 +92,7 @@ export class WorkflowsExecutionEnginePlugin
         const stepStartedAt = new Date();
 
         await this.esClient.index({
-          index: 'workflow-step-executions',
+          index: WORKFLOWS_STEP_EXECUTIONS_INDEX,
           id: workflowExecutionId,
           refresh: true,
           document: {
@@ -101,7 +120,7 @@ export class WorkflowsExecutionEnginePlugin
         const executionTimeMs = completedAt.getTime() - stepStartedAt.getTime();
 
         await this.esClient.update({
-          index: 'workflow-step-executions',
+          index: WORKFLOWS_STEP_EXECUTIONS_INDEX,
           id: workflowExecutionId,
           refresh: true,
           doc: {
@@ -113,6 +132,17 @@ export class WorkflowsExecutionEnginePlugin
           } as WorkflowStepExecution,
         });
       }
+
+      await this.esClient.update({
+        index: WORKFLOWS_EXECUTIONS_INDEX,
+        id: workflowRunId,
+        refresh: true,
+        doc: {
+          status: ExecutionStatus.COMPLETED,
+          finishedAt: new Date(),
+          duration: new Date().getTime() - workflowStartedAt.getTime(),
+        } as WorkflowExecution,
+      });
     };
 
     return {

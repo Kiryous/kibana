@@ -35,7 +35,7 @@ const workflowTemplate: CreateWorkflowRequest = {
 
 export function WorkflowsPage() {
   const { application, chrome } = useKibana().services;
-  const { refresh } = useWorkflows();
+  const { refetch } = useWorkflows();
   const { createWorkflow } = useWorkflowActions();
 
   chrome!.setBreadcrumbs([
@@ -45,11 +45,15 @@ export function WorkflowsPage() {
     },
   ]);
 
+  chrome!.docTitle.change([
+    i18n.translate('workflows.breadcrumbs.title', { defaultMessage: 'Workflows' }),
+  ]);
+
   const handleCreateWorkflow = () => {
     createWorkflow.mutate(workflowTemplate, {
       onSuccess: (data: WorkflowModel) => {
         application!.navigateToUrl(application!.getUrlForApp('workflows', { path: `/${data.id}` }));
-        refresh();
+        refetch();
       },
     });
   };

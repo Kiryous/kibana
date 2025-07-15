@@ -136,9 +136,10 @@ export function WorkflowList() {
               </EuiText>
             );
           }
-          const data = item.history.map((run) => ({
-            x: new Date(run.startedAt).getTime(),
+          const data = item.history.map((run, index) => ({
+            x: index,
             y: run.duration,
+            startedAt: run.startedAt,
             color:
               run.status === ExecutionStatus.COMPLETED
                 ? euiTheme.colors.vis.euiColorVis0
@@ -148,15 +149,23 @@ export function WorkflowList() {
           }));
           return (
             <Chart size={{ width: 160, height: 32 }}>
-              <Settings />
+              <Settings
+                xDomain={{ min: -0.5, max: Math.max(data.length - 0.5, 4.5) }}
+                theme={{
+                  scales: {
+                    barsPadding: 0.2,
+                  },
+                }}
+              />
               <BarSeries
                 id="data"
-                xScaleType={ScaleType.Time}
+                xScaleType={ScaleType.Linear}
                 yScaleType={ScaleType.Linear}
-                xAccessor={({ x }) => x}
-                yAccessors={[({ y }) => y ?? 0]}
+                xAccessor="x"
+                yAccessors={['y']}
                 data={data ?? []}
                 styleAccessor={({ datum }) => datum.color}
+                enableHistogramMode={true}
               />
             </Chart>
           );

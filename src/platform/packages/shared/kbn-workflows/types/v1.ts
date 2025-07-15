@@ -24,9 +24,13 @@ export interface WorkflowExecution {
   id: string;
   workflowId: string;
   status: ExecutionStatus;
-  startedAt: string;
-  finishedAt: string | null;
-  duration: number | null;
+  triggers: WorkflowTrigger[];
+  steps: WorkflowStep[];
+  createdAt: Date;
+  createdBy: string;
+  startedAt: Date;
+  finishedAt: Date;
+  duration: number;
 }
 
 export interface ProviderInput {
@@ -107,11 +111,23 @@ export interface WorkflowExecutionLogModel {
 export interface WorkflowExecutionModel {
   id: string;
   status: ExecutionStatus;
-  startedAt: string;
-  finishedAt: string;
+  startedAt: Date;
+  finishedAt: Date;
   workflowId?: string;
   workflowName?: string;
-  logs: WorkflowExecutionLogModel[];
+  stepExecutions: WorkflowStepExecution[];
+  duration: number | null;
+}
+
+export interface WorkflowExecutionListModel {
+  results: WorkflowExecutionModel[];
+  _pagination: {
+    offset: number;
+    limit: number;
+    total: number;
+    next?: string;
+    prev?: string;
+  };
 }
 
 // TODO: convert to actual elastic document spec

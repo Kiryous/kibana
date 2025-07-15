@@ -14,9 +14,10 @@ export type {
   WorkflowExecutionModel,
   WorkflowExecutionHistoryModel,
   WorkflowModel,
+  WorkflowNode,
   WorkflowListModel,
   WorkflowListItemModel,
-  WorkflowNode,
+  WorkflowExecutionListModel,
 
   // requests
   CreateWorkflowRequest,

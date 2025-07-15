@@ -58,6 +58,11 @@ export function useWorkflowActions() {
         body: JSON.stringify({ inputs }),
       });
     },
+    onSuccess: (_, { id }) => {
+      queryClient.invalidateQueries({ queryKey: ['workflows'] });
+      queryClient.invalidateQueries({ queryKey: ['workflows', id, 'executions'] });
+      queryClient.invalidateQueries({ queryKey: ['workflows', id] });
+    },
   });
 
   return {

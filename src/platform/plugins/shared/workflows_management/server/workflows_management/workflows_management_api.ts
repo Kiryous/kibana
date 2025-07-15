@@ -7,7 +7,13 @@
  * License v3.0 only", or the "Server Side Public License, v 1".
  */
 
-import { CreateWorkflowRequest, WorkflowListModel, WorkflowModel } from '@kbn/workflows';
+import {
+  CreateWorkflowRequest,
+  WorkflowListModel,
+  WorkflowModel,
+  WorkflowExecutionModel,
+  WorkflowExecutionListModel,
+} from '@kbn/workflows';
 import { WorkflowsService } from './workflows_management_service';
 import { SchedulerService } from '../scheduler/scheduler_service';
 
@@ -56,5 +62,33 @@ export class WorkflowsManagementApi {
       throw new Error('Scheduler service not set');
     }
     return await this.schedulerService.runWorkflow(workflow, inputs);
+  }
+
+  public async getWorkflowExecutions(workflowId: string): Promise<WorkflowExecutionListModel> {
+    return await this.workflowsService.searchWorkflowExecutions({
+      workflowId,
+    });
+  }
+
+  public async getWorkflowExecution(
+    workflowExecutionId: string
+  ): Promise<WorkflowExecutionModel | null> {
+    const workflowExecution = await this.workflowsService.getWorkflowExecution(workflowExecutionId);
+
+    if (!workflowExecution) {
+      return null;
+    }
+
+    const stepExecutions = await this.workflowsService.searchStepExecutions({
+      workflowExecutionId,
+    });
+
+    return {
+      id: workflowExecution.id,
+      status: workflowExecution.status,
+      startedAt: workflowExecution.startedAt,
+      finishedAt: workflowExecution.finishedAt,
+      stepExecutions,
+    };
   }
 }
