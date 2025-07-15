@@ -24,6 +24,7 @@ export interface WorkflowExecution {
   id: string;
   workflowId: string;
   status: ExecutionStatus;
+  error: string | null;
   triggers: WorkflowTrigger[];
   steps: WorkflowStep[];
   createdAt: Date;
@@ -135,7 +136,7 @@ export interface EsWorkflowSchema {
   id: string;
   name: string;
   description: string;
-  status: WorkflowStatus;
+  status: ExecutionStatus;
   triggers: WorkflowTrigger[];
   tags: string[];
   executions: WorkflowExecutionModel[];
