@@ -136,7 +136,7 @@ export interface EsWorkflowSchema {
   id: string;
   name: string;
   description: string;
-  status: ExecutionStatus;
+  status: WorkflowStatus;
   triggers: WorkflowTrigger[];
   tags: string[];
   executions: WorkflowExecutionModel[];
