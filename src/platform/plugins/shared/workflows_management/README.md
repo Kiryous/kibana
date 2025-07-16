@@ -14,7 +14,7 @@ Each folder is organized to separate concerns and facilitate scalable plugin dev
 
 ## Configuration ##
 By default, the plugin is disabled.
-To make the plugin work for you, in your kibana.dev.yml add this key:
+To make the plugin work for you, in your kibana.dev.yml add these keys:
 ```yml
 workflowsManagement.enabled: true
 workflowsExecutionEngine.enabled: true
