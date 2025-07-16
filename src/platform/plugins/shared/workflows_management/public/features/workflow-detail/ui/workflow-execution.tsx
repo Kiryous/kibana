@@ -15,6 +15,7 @@ import {
   EuiLoadingSpinner,
   EuiBasicTable,
   EuiBasicTableColumn,
+  EuiToolTip,
 } from '@elastic/eui';
 import { ExecutionStatus, EsWorkflowStepExecution } from '@kbn/workflows';
 import { useWorkflowExecution } from '../../../entities/workflows/model/useWorkflowExecution';
@@ -50,7 +51,17 @@ export const WorkflowExecution: React.FC<WorkflowExecutionProps> = ({
         {
           field: 'status',
           name: 'Status',
-          render: (value: ExecutionStatus) => <StatusBadge status={value} />,
+          render: (value: ExecutionStatus, item: WorkflowStepExecution) => {
+            if (value === ExecutionStatus.FAILED) {
+              return (
+                <EuiToolTip content={item.error}>
+                  <StatusBadge status={value} />
+                </EuiToolTip>
+              );
+            }
+
+            return <StatusBadge status={value} />;
+          },
         },
         {
           field: 'executionTimeMs',
@@ -99,10 +110,37 @@ export const WorkflowExecution: React.FC<WorkflowExecutionProps> = ({
   }
 
   return (
-    <EuiBasicTable
-      columns={columns}
-      items={workflowExecution?.stepExecutions ?? []}
-      responsiveBreakpoint={false}
-    />
+    <div>
+      <EuiText>
+        <h3>Workflow Execution Details</h3>
+        {workflowExecution?.status && (
+          <EuiFlexGroup alignItems="center" gutterSize="s">
+            <strong>Status:</strong>
+            <StatusBadge status={workflowExecution?.status} />
+          </EuiFlexGroup>
+        )}
+        {workflowExecution?.startedAt && (
+          <div>
+            <strong>Started At:</strong>
+            {workflowExecution?.startedAt?.toLocaleString()}
+          </div>
+        )}
+        {workflowExecution?.finishedAt && (
+          <div>
+            <strong>Finished At:</strong> {workflowExecution?.finishedAt?.toLocaleString()}
+          </div>
+        )}
+        {workflowExecution?.duration !== undefined && (
+          <div>
+            <strong>Duration:</strong> {workflowExecution?.duration} ms
+          </div>
+        )}
+      </EuiText>
+      <EuiBasicTable
+        columns={columns}
+        items={workflowExecution?.stepExecutions ?? []}
+        responsiveBreakpoint={false}
+      />
+    </div>
   );
 };

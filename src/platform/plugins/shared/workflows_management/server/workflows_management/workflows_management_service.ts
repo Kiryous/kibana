@@ -27,7 +27,6 @@ import { getWorkflowExecution } from './lib/get_workflow_execution';
 import { createWorkflow } from './lib/create_workflow';
 import { GetWorkflowsParams } from './workflows_management_api';
 import { searchWorkflows } from './lib/search_workflows';
-import { searchStepExecutions } from './lib/search_step_executions';
 import { searchWorkflowExecutions } from './lib/search_workflow_executions';
 import { WORKFLOW_ZOD_SCHEMA_LOOSE } from '../../common';
 import { getYamlStringFromJSON, parseWorkflowYamlToJSON } from '../../common/lib/yaml-utils';

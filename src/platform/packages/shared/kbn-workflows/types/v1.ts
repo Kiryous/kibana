@@ -30,6 +30,7 @@ export interface EsWorkflowExecution {
   triggers: EsWorkflowTrigger[];
   steps: EsWorkflowStep[];
   createdAt: string;
+  error: string | null;
   createdBy: string;
   startedAt: string;
   finishedAt: string;
