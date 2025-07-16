@@ -229,6 +229,7 @@ export const WorkflowSchema = z.object({
 });
 
 export const WorkflowYamlSchema = z.object({
+  version: z.literal('1').default('1').describe('The version of the workflow schema'),
   workflow: WorkflowSchema,
 });
 
