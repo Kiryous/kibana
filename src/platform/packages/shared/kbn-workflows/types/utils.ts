@@ -8,12 +8,12 @@
  */
 
 import { WorkflowYaml } from '../spec/schema';
-import { EsWorkflowTrigger, WorkflowExecutionEngineModel, WorkflowStatus } from './v1';
+import { EsWorkflow, EsWorkflowTrigger, WorkflowStatus } from './v1';
 
-export function transformWorkflowYamlJsontoExecutionEngineModel(
+export function transformWorkflowYamlJsontoEsWorkflow(
   workflow: Partial<WorkflowYaml>
-): Omit<WorkflowExecutionEngineModel, 'id'> {
-  const { name, enabled, triggers, steps } = workflow.workflow!;
+): Omit<EsWorkflow, 'id' | 'createdAt' | 'createdBy' | 'lastUpdatedAt' | 'lastUpdatedBy' | 'yaml'> {
+  const { name, description, tags, enabled, triggers, steps } = workflow.workflow!;
 
   const triggersMap = {
     'triggers.elastic.detectionRule': 'detection-rule',
@@ -25,6 +25,8 @@ export function transformWorkflowYamlJsontoExecutionEngineModel(
 
   return {
     name,
+    description,
+    tags: tags ?? [],
     status: enabled ? WorkflowStatus.ACTIVE : WorkflowStatus.DRAFT,
     triggers: triggers?.map((trigger) => ({
       id: trigger.type,
@@ -43,9 +45,7 @@ export function transformWorkflowYamlJsontoExecutionEngineModel(
   };
 }
 
-export function transformWorkflowExecutionEngineModelToYaml(
-  workflow: WorkflowExecutionEngineModel
-): WorkflowYaml {
+export function transformEsWorkflowToYamlJson(workflow: Omit<EsWorkflow, 'id'>): WorkflowYaml {
   const triggersMap = {
     'detection-rule': 'triggers.elastic.detectionRule',
     schedule: 'triggers.elastic.scheduled',

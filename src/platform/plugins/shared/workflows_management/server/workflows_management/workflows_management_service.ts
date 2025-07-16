@@ -9,11 +9,11 @@
 
 import { ElasticsearchClient, Logger } from '@kbn/core/server';
 import {
-  transformWorkflowExecutionEngineModelToYaml,
+  transformEsWorkflowToYamlJson,
+  transformWorkflowYamlJsontoEsWorkflow,
   WorkflowExecutionDto,
   WorkflowListDto,
 } from '@kbn/workflows';
-import { transformWorkflowYamlJsontoExecutionEngineModel } from '@kbn/workflows';
 import {
   CreateWorkflowCommand,
   EsWorkflow,
@@ -111,7 +111,8 @@ export class WorkflowsService {
       throw new Error('Elasticsearch client not initialized');
     }
     if (!workflow.yaml) {
-      const yamlObject = transformWorkflowExecutionEngineModelToYaml(workflow);
+      // If the yaml is not provided, transform workflow object to yaml
+      const yamlObject = transformEsWorkflowToYamlJson(workflow);
       workflow.yaml = getYamlStringFromJSON(yamlObject);
     }
     return await createWorkflow({
@@ -140,7 +141,7 @@ export class WorkflowsService {
           workflow,
         });
       }
-      const updatedWorkflow = transformWorkflowYamlJsontoExecutionEngineModel(parsedYaml.data);
+      const updatedWorkflow = transformWorkflowYamlJsontoEsWorkflow(parsedYaml.data);
       return await updateWorkflow({
         esClient: this.esClient,
         logger: this.logger,

@@ -222,6 +222,7 @@ export const WorkflowSchema = z.object({
   description: z.string().optional(),
   settings: WorkflowSettingsSchema.optional(),
   enabled: z.boolean().default(true),
+  tags: z.array(z.string()).optional(),
   triggers: z.array(TriggerSchema).min(1),
   inputs: z.array(WorkflowInputSchema).optional(),
   consts: WorkflowConstsSchema.optional(),
