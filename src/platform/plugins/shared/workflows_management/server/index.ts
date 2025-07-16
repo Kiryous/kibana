@@ -8,16 +8,10 @@
  */
 
 import type { PluginInitializerContext } from '@kbn/core/server';
-import { schema, TypeOf } from '@kbn/config-schema';
+export { config } from './config';
+
 //  This exports static code and TypeScript types,
 //  as well as, Kibana Platform `plugin()` initializer.
-
-export const config = {
-  schema: schema.object({
-    enabled: schema.boolean({ defaultValue: false }),
-  }),
-};
-export type MyPluginConfigType = TypeOf<typeof config.schema>;
 
 export async function plugin(initializerContext: PluginInitializerContext) {
   const { WorkflowsPlugin } = await import('./plugin');
