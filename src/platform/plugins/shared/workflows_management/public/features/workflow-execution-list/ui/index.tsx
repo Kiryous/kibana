@@ -107,7 +107,7 @@ export function WorkflowExecutionList({ workflowId }: { workflowId: string }) {
         {selectedWorkflowExecutionId ? (
           <WorkflowExecution
             workflowExecutionId={selectedWorkflowExecutionId}
-            fields={['stepId', 'status', 'executionTimeMs', 'error']}
+            fields={['stepId', 'status', 'executionTimeMs']}
           />
         ) : (
           <EuiFlexGroup
