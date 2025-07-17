@@ -32,7 +32,7 @@ export function transformWorkflowYamlJsontoEsWorkflow(
       id: trigger.type,
       type: triggersMap[trigger.type] as EsWorkflowTrigger['type'],
       enabled: true,
-      config: trigger.type === 'triggers.elastic.detectionRule' ? { ...trigger.with } : {},
+      config: trigger.type === 'triggers.elastic.detectionRule' || trigger.type === 'triggers.elastic.scheduled' ? { ...trigger.with } : {},
     })),
     steps: steps?.map((step) => ({
       id: step.name,

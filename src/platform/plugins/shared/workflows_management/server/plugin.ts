@@ -50,6 +50,7 @@ export class WorkflowsPlugin implements Plugin<WorkflowsPluginSetup, WorkflowsPl
   private workflowTaskScheduler: WorkflowTaskScheduler | null = null;
   private unsecureActionsClient: IUnsecuredActionsClient | null = null;
   private api: WorkflowsManagementApi | null = null;
+  private coreSetup: CoreSetup | null = null;
   // TODO: replace with esClient promise from core
   private esClient: Client = new Client({
     node: 'http://localhost:9200', // or your ES URL
@@ -65,6 +66,7 @@ export class WorkflowsPlugin implements Plugin<WorkflowsPluginSetup, WorkflowsPl
 
   public setup(core: CoreSetup, plugins: WorkflowsManagementPluginServerDependenciesSetup) {
     this.logger.debug('Workflows Management: Setup');
+    this.coreSetup = core;
 
     // Register workflow task definition
     if (plugins.taskManager) {
@@ -75,14 +77,25 @@ export class WorkflowsPlugin implements Plugin<WorkflowsPluginSetup, WorkflowsPl
           timeout: '5m',
           maxAttempts: 3,
           createTaskRunner: ({ taskInstance }) => {
-            // This will be properly initialized in the start method
+            // Capture the plugin instance in a closure
+            const plugin = this;
+            // Use a factory pattern to get dependencies when the task runs
             return {
               async run() {
-                // This is a placeholder - the real task runner will be set up in start()
-                return { state: {} };
+                // Get dependencies when the task actually runs
+                const [coreStart, pluginsStart] = await core.getStartServices();
+                
+                // Create the actual task runner with dependencies
+                const taskRunner = createWorkflowTaskRunner({
+                  logger: plugin.logger,
+                  workflowsService: plugin.workflowsService!,
+                  workflowsExecutionEngine: (pluginsStart as any).workflowsExecutionEngine,
+                })({ taskInstance });
+                
+                return taskRunner.run();
               },
               async cancel() {
-                // Placeholder cancel function
+                // Cancel function for the task
               },
             };
           },

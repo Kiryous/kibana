@@ -80,6 +80,7 @@ export class WorkflowTaskScheduler {
   /**
    * Unschedules all tasks for a workflow
    */
+  
   async unscheduleWorkflowTasks(workflowId: string): Promise<void> {
     try {
       // Find all tasks for this workflow
@@ -88,7 +89,7 @@ export class WorkflowTaskScheduler {
           bool: {
             must: [
               { term: { 'task.taskType': 'workflow:scheduled' } },
-              { term: { 'task.params.workflowId': workflowId } },
+              { term: { '_id': `task:workflow:${workflowId}:triggers.elastic.scheduled` } },
             ],
           },
         },

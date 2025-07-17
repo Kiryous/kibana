@@ -126,7 +126,7 @@ export class WorkflowsService {
       logger: this.logger,
       workflowIndex: this.workflowIndex,
       workflow,
-      taskScheduler: this.taskScheduler || undefined,
+      taskScheduler: this.taskScheduler,
       spaceId: 'default', // TODO: Get from context
     });
   }
@@ -147,7 +147,7 @@ export class WorkflowsService {
           workflowIndex: this.workflowIndex,
           workflowId: id,
           workflow,
-          taskScheduler: this.taskScheduler || undefined,
+          taskScheduler: this.taskScheduler,
         });
       }
       const updatedWorkflow = transformWorkflowYamlJsontoEsWorkflow(parsedYaml.data);
@@ -157,7 +157,7 @@ export class WorkflowsService {
         workflowIndex: this.workflowIndex,
         workflowId: id,
         workflow: { ...updatedWorkflow, yaml: workflow.yaml },
-        taskScheduler: this.taskScheduler || undefined,
+        taskScheduler: this.taskScheduler,
       });
     }
     return await updateWorkflow({
@@ -166,7 +166,7 @@ export class WorkflowsService {
       workflowIndex: this.workflowIndex,
       workflowId: id,
       workflow,
-      taskScheduler: this.taskScheduler || undefined,
+      taskScheduler: this.taskScheduler,
       spaceId: 'default', // TODO: Get from context
     });
   }
@@ -180,7 +180,7 @@ export class WorkflowsService {
       logger: this.logger,
       workflowIndex: this.workflowIndex,
       workflowIds,
-      taskScheduler: this.taskScheduler || undefined,
+      taskScheduler: this.taskScheduler,
     });
   }
 
