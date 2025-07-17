@@ -111,16 +111,10 @@ export class WorkflowsPlugin implements Plugin<WorkflowsPluginSetup, WorkflowsPl
       scope: [KibanaFeatureScope.Spaces, KibanaFeatureScope.Security],
       app: [],
       order: FEATURE_ORDER,
-      management: {
-        kibana: ['workflowsManagement'],
-      },
       privileges: {
         all: {
           app: [],
-          api: [],
-          management: {
-            kibana: ['workflowsManagement'],
-          },
+          api: ['create', 'update', 'delete', 'read'],
           savedObject: {
             all: ['workflows', 'workflow_executions'],
             read: [],
@@ -129,10 +123,7 @@ export class WorkflowsPlugin implements Plugin<WorkflowsPluginSetup, WorkflowsPl
         },
         read: {
           app: [],
-          api: [],
-          management: {
-            kibana: ['workflowsManagement'],
-          },
+          api: ['read'],
           savedObject: {
             all: [],
             read: ['workflows', 'workflow_executions'],
@@ -225,7 +216,7 @@ export class WorkflowsPlugin implements Plugin<WorkflowsPluginSetup, WorkflowsPl
                       defaultMessage: 'Read',
                     }
                   ),
-                  includeIn: 'all',
+                  includeIn: 'read',
                   savedObject: {
                     read: ['workflow'],
                     all: [],
@@ -241,7 +232,7 @@ export class WorkflowsPlugin implements Plugin<WorkflowsPluginSetup, WorkflowsPl
                       defaultMessage: 'Read Workflow Execution',
                     }
                   ),
-                  includeIn: 'all',
+                  includeIn: 'read',
                   savedObject: {
                     read: ['workflow_execution'],
                     all: [],
@@ -451,7 +442,7 @@ export class WorkflowsPlugin implements Plugin<WorkflowsPluginSetup, WorkflowsPl
     this.api = new WorkflowsManagementApi(this.workflowsService);
 
     // Register server side APIs
-    defineRoutes(router, this.api);
+    defineRoutes(router, this.api, this.logger);
 
     return {
       management: this.api,
