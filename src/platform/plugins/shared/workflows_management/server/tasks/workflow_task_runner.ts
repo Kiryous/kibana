@@ -23,6 +23,8 @@ export interface WorkflowTaskState {
   lastRunError?: string;
 }
 
+// This function creates a task runner for scheduled workflow tasks
+// It will be used by the Task Manager to run the workflow execution
 export function createWorkflowTaskRunner({
   logger,
   workflowsService,

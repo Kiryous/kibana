@@ -32,7 +32,7 @@ export const searchStepExecutions = async ({
         'workflowRunId.keyword': workflowExecutionId 
       }  
     },
-      sort: 'startedAt:desc',
+      sort: 'startedAt:dsc',
     });
 
     logger.info(
