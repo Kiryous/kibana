@@ -77,6 +77,7 @@ export function createWorkflowTaskRunner({
                 source: 'task-manager',
               },
               connectorCredentials,
+              triggeredBy: 'scheduled', // <-- mark as scheduled
             }
           );
 

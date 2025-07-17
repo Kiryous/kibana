@@ -61,6 +61,7 @@ export class SchedulerService {
       inputs,
       event: 'event' in inputs ? inputs.event : undefined,
       connectorCredentials,
+      triggeredBy: 'manual', // <-- mark as manual
     });
 
     return workflowRunId;
