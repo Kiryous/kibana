@@ -9,7 +9,6 @@
 
 import { ElasticsearchClient, Logger } from '@kbn/core/server';
 import {
-  transformEsWorkflowToYamlJson,
   transformWorkflowYamlJsontoEsWorkflow,
   WorkflowExecutionDto,
   WorkflowListDto,
@@ -29,7 +28,7 @@ import { GetWorkflowsParams } from './workflows_management_api';
 import { searchWorkflows } from './lib/search_workflows';
 import { searchWorkflowExecutions } from './lib/search_workflow_executions';
 import { WORKFLOW_ZOD_SCHEMA_LOOSE } from '../../common';
-import { getYamlStringFromJSON, parseWorkflowYamlToJSON } from '../../common/lib/yaml-utils';
+import { parseWorkflowYamlToJSON } from '../../common/lib/yaml-utils';
 
 export class WorkflowsService {
   private esClient: ElasticsearchClient | null = null;
@@ -110,16 +109,16 @@ export class WorkflowsService {
     if (!this.esClient) {
       throw new Error('Elasticsearch client not initialized');
     }
-    if (!workflow.yaml) {
-      // If the yaml is not provided, transform workflow object to yaml
-      const yamlObject = transformEsWorkflowToYamlJson(workflow);
-      workflow.yaml = getYamlStringFromJSON(yamlObject);
+    const parsedYaml = parseWorkflowYamlToJSON(workflow.yaml, WORKFLOW_ZOD_SCHEMA_LOOSE);
+    if (!parsedYaml.success) {
+      throw new Error('Invalid workflow yaml: ' + parsedYaml.error.message);
     }
+    const workflowToCreate = transformWorkflowYamlJsontoEsWorkflow(parsedYaml.data);
     return await createWorkflow({
       esClient: this.esClient,
       logger: this.logger,
       workflowIndex: this.workflowIndex,
-      workflow,
+      workflow: { ...workflowToCreate, yaml: workflow.yaml },
     });
   }
 
@@ -130,16 +129,11 @@ export class WorkflowsService {
     if (!this.esClient) {
       throw new Error('Elasticsearch client not initialized');
     }
-    if (workflow.yaml) {
-      const parsedYaml = parseWorkflowYamlToJSON(workflow.yaml, WORKFLOW_ZOD_SCHEMA_LOOSE);
+    const { yaml, definition, ...rest } = workflow;
+    if (yaml) {
+      const parsedYaml = parseWorkflowYamlToJSON(yaml, WORKFLOW_ZOD_SCHEMA_LOOSE);
       if (!parsedYaml.success) {
-        return await updateWorkflow({
-          esClient: this.esClient,
-          logger: this.logger,
-          workflowIndex: this.workflowIndex,
-          workflowId: id,
-          workflow,
-        });
+        throw new Error('Invalid workflow yaml: ' + parsedYaml.error.message);
       }
       const updatedWorkflow = transformWorkflowYamlJsontoEsWorkflow(parsedYaml.data);
       return await updateWorkflow({
@@ -155,7 +149,8 @@ export class WorkflowsService {
       logger: this.logger,
       workflowIndex: this.workflowIndex,
       workflowId: id,
-      workflow,
+      // we only update the workflow definition if the yaml is provided, otherwise we update the rest of the workflow
+      workflow: rest,
     });
   }
 

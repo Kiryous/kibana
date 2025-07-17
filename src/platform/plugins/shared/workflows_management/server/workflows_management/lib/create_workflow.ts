@@ -55,13 +55,12 @@ function transformToCreateScheme(workflow: CreateWorkflowCommand): Omit<EsWorkfl
     name: workflow.name,
     description: workflow.description || '',
     status: workflow.status || WorkflowStatus.DRAFT,
-    triggers: workflow.triggers || [],
-    steps: workflow.steps || [],
     tags: [],
     yaml: workflow.yaml,
     createdAt: new Date(),
     createdBy: 'system',
     lastUpdatedAt: new Date(),
     lastUpdatedBy: 'system',
+    definition: workflow.definition,
   };
 }

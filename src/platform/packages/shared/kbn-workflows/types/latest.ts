@@ -10,8 +10,6 @@
 export type {
   // elasticsearch documents types
   EsWorkflow,
-  EsWorkflowTrigger,
-  EsWorkflowStep,
   EsWorkflowExecution,
   EsWorkflowStepExecution,
   WorkflowExecutionLogModel,

@@ -120,7 +120,9 @@ export function WorkflowList() {
         render: (value, item) => {
           return (
             <EuiText size="s" color="subdued">
-              {item.triggers.map((trigger) => toSentenceCase(trigger.type)).join(', ')}
+              {item?.definition?.workflow?.triggers
+                .map((trigger) => toSentenceCase(trigger.type))
+                .join(', ')}
             </EuiText>
           );
         },
