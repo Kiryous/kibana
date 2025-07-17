@@ -90,6 +90,7 @@ export class WorkflowsPlugin implements Plugin<WorkflowsPluginSetup, WorkflowsPl
                   logger: plugin.logger,
                   workflowsService: plugin.workflowsService!,
                   workflowsExecutionEngine: (pluginsStart as any).workflowsExecutionEngine,
+                  actionsClient: plugin.unsecureActionsClient!,
                 })({ taskInstance });
                 
                 return taskRunner.run();

@@ -11,6 +11,8 @@ import type { ConcreteTaskInstance } from '@kbn/task-manager-plugin/server';
 import type { Logger } from '@kbn/core/server';
 import type { WorkflowsService } from '../workflows_management/workflows_management_service';
 import type { WorkflowsExecutionEnginePluginStart } from '@kbn/workflows-execution-engine/server';
+import type { IUnsecuredActionsClient } from '@kbn/actions-plugin/server';
+import { extractConnectorIds } from '../scheduler/lib/extract_connector_ids';
 
 export interface WorkflowTaskParams {
   workflowId: string;
@@ -29,10 +31,12 @@ export function createWorkflowTaskRunner({
   logger,
   workflowsService,
   workflowsExecutionEngine,
+  actionsClient,
 }: {
   logger: Logger;
   workflowsService: WorkflowsService;
   workflowsExecutionEngine: WorkflowsExecutionEnginePluginStart;
+  actionsClient: IUnsecuredActionsClient;
 }) {
   return ({ taskInstance }: { taskInstance: ConcreteTaskInstance }) => {
     const { workflowId, spaceId } = taskInstance.params as WorkflowTaskParams;
@@ -58,6 +62,9 @@ export function createWorkflowTaskRunner({
             steps: workflow.steps,
           };
 
+          // Extract connector credentials for the workflow
+          const connectorCredentials = await extractConnectorIds(workflowExecutionModel, actionsClient);
+
           // Execute the workflow
           const executionId = await workflowsExecutionEngine.executeWorkflow(
             workflowExecutionModel,
@@ -69,7 +76,7 @@ export function createWorkflowTaskRunner({
                 timestamp: new Date().toISOString(),
                 source: 'task-manager',
               },
-              connectorCredentials: {},
+              connectorCredentials,
             }
           );
 
