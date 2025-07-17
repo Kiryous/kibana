@@ -285,7 +285,7 @@ export class WorkflowsPlugin implements Plugin<WorkflowsPluginSetup, WorkflowsPl
 
     this.unsecureActionsClient = plugins.actions.getUnsecuredActionsClient();
 
-    // Initialize workflow task scheduler
+    // Initialize workflow task scheduler with the start contract
     this.workflowTaskScheduler = new WorkflowTaskScheduler(
       this.logger,
       plugins.taskManager
