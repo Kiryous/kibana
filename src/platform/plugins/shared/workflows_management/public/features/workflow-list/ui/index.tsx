@@ -118,6 +118,13 @@ export function WorkflowList() {
         name: 'Triggers',
         field: 'triggers',
         render: (value, item) => {
+          if (!item.definition.workflow?.triggers?.length) {
+            return (
+              <EuiText size="s" color="subdued">
+                No triggers
+              </EuiText>
+            );
+          }
           return (
             <EuiText size="s" color="subdued">
               {item?.definition?.workflow?.triggers

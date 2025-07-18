@@ -132,6 +132,12 @@ export const CreateWorkflowCommandSchema = z.object({
 
 export type CreateWorkflowCommand = z.infer<typeof CreateWorkflowCommandSchema>;
 
+export interface UpdatedWorkflowResponseDto {
+  id: string;
+  lastUpdatedAt: Date;
+  lastUpdatedBy: string;
+}
+
 export interface WorkflowDetailDto {
   id: string;
   name: string;
