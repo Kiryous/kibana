@@ -51,6 +51,7 @@ export const WorkflowExecutionLogsTable: React.FC<WorkflowExecutionLogsTableProp
       {
         field: 'timestamp',
         name: 'Timestamp',
+        width: '20%',
         render: (timestamp: string | undefined) => {
           if (!timestamp) return 'N/A';
           const date = new Date(timestamp);
@@ -62,6 +63,7 @@ export const WorkflowExecutionLogsTable: React.FC<WorkflowExecutionLogsTableProp
       {
         field: 'level',
         name: 'Level',
+        width: '10%',
         render: (level: WorkflowExecutionLogEntry['level']) => {
           const colorMap = {
             info: 'primary',
@@ -80,6 +82,7 @@ export const WorkflowExecutionLogsTable: React.FC<WorkflowExecutionLogsTableProp
       {
         field: 'stepName',
         name: 'Step',
+        width: '15%',
         render: (stepName: string | undefined, log: WorkflowExecutionLogEntry) => {
           const displayName = stepName || log.stepId || 'Workflow';
           const icon = stepName || log.stepId ? 'node' : 'workflow';
@@ -95,17 +98,14 @@ export const WorkflowExecutionLogsTable: React.FC<WorkflowExecutionLogsTableProp
       {
         field: 'connectorType',
         name: 'Connector Type',
+        width: '15%',
         render: (connectorType: string | undefined) => connectorType || 'N/A',
       },
       {
         field: 'message',
         name: 'Message',
+        width: '40%',
         render: (message: string | undefined) => message || 'N/A',
-      },
-      {
-        field: 'duration',
-        name: 'Duration (ms)',
-        render: (duration: number | undefined) => duration || 'N/A',
       },
     ],
     []
