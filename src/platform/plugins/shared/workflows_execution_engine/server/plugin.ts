@@ -77,8 +77,7 @@ export class WorkflowsExecutionEnginePlugin
         document: {
           id: workflowRunId,
           workflowId: workflow.id,
-          triggers: (workflow as any).triggers,
-          steps: (workflow as any).steps,
+          workflowDefinition: workflow.definition,
           status: workflowExecutionStatus,
           createdAt: workflowCreatedAt.toISOString(),
           startedAt: workflowStartedAt.toISOString(),
@@ -108,7 +107,7 @@ export class WorkflowsExecutionEnginePlugin
           esApiKey: context.esApiKey,
         });
 
-        for (const currentStep of (workflow as any).steps) {
+        for (const currentStep of workflow.definition.workflow.steps) {
           const step = new StepFactory().create(
             currentStep as any,
             contextManager,

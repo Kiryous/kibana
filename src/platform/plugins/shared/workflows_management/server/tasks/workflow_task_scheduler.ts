@@ -9,8 +9,15 @@
 
 import type { Logger } from '@kbn/core/server';
 import type { TaskManagerStartContract } from '@kbn/task-manager-plugin/server';
-import type { EsWorkflow, EsWorkflowTrigger } from '@kbn/workflows';
+import type { EsWorkflow } from '@kbn/workflows';
 import { convertWorkflowScheduleToTaskSchedule, getScheduledTriggers } from '../lib/schedule_utils';
+
+// Define the trigger type based on the schema
+type WorkflowTrigger = {
+  id: string;
+  type: 'triggers.elastic.detectionRule' | 'triggers.elastic.scheduled' | 'triggers.elastic.manual';
+  with?: Record<string, any>;
+};
 
 export interface WorkflowTaskSchedulerParams {
   workflowId: string;
@@ -28,7 +35,7 @@ export class WorkflowTaskScheduler {
    * Schedules tasks for all enabled scheduled triggers in a workflow
    */
   async scheduleWorkflowTasks(workflow: EsWorkflow, spaceId: string): Promise<string[]> {
-    const scheduledTriggers = getScheduledTriggers(workflow.triggers);
+    const scheduledTriggers = getScheduledTriggers(workflow.definition.workflow.triggers);
     const scheduledTaskIds: string[] = [];
 
     for (const trigger of scheduledTriggers) {
@@ -51,12 +58,12 @@ export class WorkflowTaskScheduler {
   async scheduleWorkflowTask(
     workflowId: string,
     spaceId: string,
-    trigger: EsWorkflowTrigger
+    trigger: WorkflowTrigger
   ): Promise<string> {
     const schedule = convertWorkflowScheduleToTaskSchedule(trigger);
     
     const taskInstance = {
-      id: `workflow:${workflowId}:${trigger.id}`,
+      id: `workflow:${workflowId}:${trigger.type}`,
       taskType: 'workflow:scheduled',
       schedule,
       params: {

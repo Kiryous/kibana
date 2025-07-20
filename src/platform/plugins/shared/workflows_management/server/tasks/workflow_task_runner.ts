@@ -58,8 +58,7 @@ export function createWorkflowTaskRunner({
             id: workflow.id,
             name: workflow.name,
             status: workflow.status,
-            triggers: workflow.triggers,
-            steps: workflow.steps,
+            definition: workflow.definition,
           };
 
           // Extract connector credentials for the workflow

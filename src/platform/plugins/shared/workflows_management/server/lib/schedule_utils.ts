@@ -7,17 +7,23 @@
  * License v3.0 only", or the "Server Side Public License, v 1".
  */
 
-import { EsWorkflowTrigger } from '@kbn/workflows';
+// Define the trigger type based on the schema
+type WorkflowTrigger = {
+  id: string;
+  type: 'triggers.elastic.detectionRule' | 'triggers.elastic.scheduled' | 'triggers.elastic.manual';
+  with?: Record<string, any>;
+  enabled?: boolean;
+};
 
 /**
  * Converts a workflow scheduled trigger to a task manager schedule format
  */
-export function convertWorkflowScheduleToTaskSchedule(trigger: EsWorkflowTrigger) {
-  if (trigger.type !== 'schedule') {
-    throw new Error(`Expected trigger type 'schedule', got '${trigger.type}'`);
+export function convertWorkflowScheduleToTaskSchedule(trigger: WorkflowTrigger) {
+  if (trigger.type !== 'triggers.elastic.scheduled') {
+    throw new Error(`Expected trigger type 'triggers.elastic.scheduled', got '${trigger.type}'`);
   }
 
-  const config = trigger.config || {};
+  const config = trigger.with || {};
   
   // Handle interval-based scheduling (e.g., every 5 minutes)
   if (config.every && config.unit) {
@@ -70,13 +76,13 @@ export function convertWorkflowScheduleToTaskSchedule(trigger: EsWorkflowTrigger
 /**
  * Checks if a workflow has any scheduled triggers
  */
-export function hasScheduledTriggers(triggers: EsWorkflowTrigger[]): boolean {
-  return triggers.some(trigger => trigger.type === 'schedule' && trigger.enabled);
+export function hasScheduledTriggers(triggers: WorkflowTrigger[]): boolean {
+  return triggers.some(trigger => trigger.type === 'triggers.elastic.scheduled' && trigger.enabled);
 }
 
 /**
  * Gets all scheduled triggers from a workflow
  */
-export function getScheduledTriggers(triggers: EsWorkflowTrigger[]): EsWorkflowTrigger[] {
-  return triggers.filter(trigger => trigger.type === 'schedule' && trigger.enabled);
+export function getScheduledTriggers(triggers: WorkflowTrigger[]): WorkflowTrigger[] {
+  return triggers.filter(trigger => trigger.type === 'triggers.elastic.scheduled' && trigger.enabled);
 } 

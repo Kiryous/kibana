@@ -12,6 +12,7 @@ import {
   transformWorkflowYamlJsontoEsWorkflow,
   WorkflowExecutionDto,
   WorkflowListDto,
+  WorkflowExecutionHistoryModel,
 } from '@kbn/workflows';
 import {
   CreateWorkflowCommand,
@@ -94,19 +95,66 @@ export class WorkflowsService {
       sortOrder: 'desc',
     });
 
-    const results = response.saved_objects.map((so) => ({
-      id: so.id,
-      name: so.attributes.name,
-      description: so.attributes.description || '',
-      status: so.attributes.status,
-      tags: so.attributes.tags,
-      createdAt: new Date(so.created_at!),
-      createdBy: so.attributes.createdBy,
-      lastUpdatedAt: new Date(so.updated_at!),
-      lastUpdatedBy: so.attributes.lastUpdatedBy,
-      definition: so.attributes.definition as any,
-      history: [],
-    }));
+    // Get workflow IDs to fetch execution history
+    const workflowIds = response.saved_objects.map((so) => so.id);
+
+    // Fetch execution history for all workflows in parallel
+    const executionHistoryPromises = workflowIds.map(async (workflowId) => {
+      try {
+        const executions = await this.searchWorkflowExecutions({ workflowId });
+        return {
+          workflowId,
+          history: executions.results.map((execution) => ({
+            id: execution.id,
+            workflowId: execution.workflowId,
+            workflowName: '', // Will be filled from workflow data
+            status: execution.status,
+            startedAt: execution.startedAt,
+            finishedAt: execution.finishedAt,
+            duration: execution.duration,
+          })),
+        };
+      } catch (error) {
+        this.logger.warn(`Failed to fetch execution history for workflow ${workflowId}: ${error}`);
+        return {
+          workflowId,
+          history: [],
+        };
+      }
+    });
+
+    const executionHistoryResults = await Promise.all(executionHistoryPromises);
+    
+    // Create a map for quick lookup
+    const historyByWorkflowId = executionHistoryResults.reduce((acc, result) => {
+      acc[result.workflowId] = result.history;
+      return acc;
+    }, {} as Record<string, WorkflowExecutionHistoryModel[]>);
+
+    const results = response.saved_objects.map((so) => {
+      const workflowName = so.attributes.name;
+      const workflowHistory = historyByWorkflowId[so.id] || [];
+      
+      // Update workflowName in history items
+      const historyWithWorkflowName = workflowHistory.map((historyItem: WorkflowExecutionHistoryModel) => ({
+        ...historyItem,
+        workflowName,
+      }));
+
+      return {
+        id: so.id,
+        name: so.attributes.name,
+        description: so.attributes.description || '',
+        status: so.attributes.status,
+        tags: so.attributes.tags,
+        createdAt: new Date(so.created_at!),
+        createdBy: so.attributes.createdBy,
+        lastUpdatedAt: new Date(so.updated_at!),
+        lastUpdatedBy: so.attributes.lastUpdatedBy,
+        definition: so.attributes.definition as any,
+        history: historyWithWorkflowName,
+      };
+    });
 
     return {
       results,
@@ -232,14 +280,14 @@ export class WorkflowsService {
       };
 
       // Update scheduled tasks if triggers changed
-      if (this.taskScheduler && updatedWorkflow.triggers) {
+      if (this.taskScheduler && updatedWorkflow.definition?.workflow?.triggers) {
         // Remove existing scheduled tasks for this workflow
-        await this.taskScheduler.removeScheduledWorkflowTasks(id);
+        await this.taskScheduler.unscheduleWorkflowTasks(id);
         
         // Add new scheduled tasks
-        for (const trigger of updatedWorkflow.triggers) {
-          if (trigger.type === 'schedule' && trigger.enabled) {
-            await this.taskScheduler.scheduleWorkflowTask(id, trigger.config);
+        for (const trigger of updatedWorkflow.definition.workflow.triggers) {
+          if (trigger.type === 'triggers.elastic.scheduled') {
+            await this.taskScheduler.scheduleWorkflowTask(id, 'default', trigger);
           }
         }
       }
@@ -269,7 +317,7 @@ export class WorkflowsService {
     // Remove scheduled tasks for deleted workflows
     if (this.taskScheduler) {
       for (const workflowId of workflowIds) {
-        await this.taskScheduler.removeScheduledWorkflowTasks(workflowId);
+        await this.taskScheduler.unscheduleWorkflowTasks(workflowId);
       }
     }
 
