@@ -13,3 +13,4 @@ export const PLUGIN_NAME = 'Workflows Execution Engine';
 export const WORKFLOWS_INDEX = '.workflows';
 export const WORKFLOWS_EXECUTIONS_INDEX = '.workflow-executions';
 export const WORKFLOWS_STEP_EXECUTIONS_INDEX = '.workflow-step-executions';
+export const WORKFLOWS_EXECUTION_LOGS_INDEX = '.workflow-execution-logs';

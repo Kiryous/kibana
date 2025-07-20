@@ -31,7 +31,7 @@ import type {
 } from './types';
 
 import { ConnectorExecutor } from './connector-executor';
-import { WORKFLOWS_EXECUTIONS_INDEX, WORKFLOWS_STEP_EXECUTIONS_INDEX } from '../common';
+import { WORKFLOWS_EXECUTIONS_INDEX, WORKFLOWS_STEP_EXECUTIONS_INDEX, WORKFLOWS_EXECUTION_LOGS_INDEX } from '../common';
 import { StepFactory } from './step/step-factory';
 import { WorkflowContextManager } from './workflow-context-manager/workflow-context-manager';
 
@@ -106,7 +106,7 @@ export class WorkflowsExecutionEnginePlugin
         esApiKey: context.esApiKey,
         // Enable workflow event logging
         logger: this.logger,
-        workflowEventLoggerIndex: '.workflows-execution-logs',
+        workflowEventLoggerIndex: WORKFLOWS_EXECUTION_LOGS_INDEX,
         esClient: this.esClient,
       });
 
