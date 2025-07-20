@@ -31,7 +31,7 @@ import type {
 } from './types';
 
 import { ConnectorExecutor } from './connector-executor';
-import { WORKFLOWS_EXECUTIONS_INDEX, WORKFLOWS_STEP_EXECUTIONS_INDEX } from '../common';
+import { WORKFLOWS_EXECUTIONS_INDEX, WORKFLOWS_STEP_EXECUTIONS_INDEX, WORKFLOWS_EXECUTION_LOGS_INDEX } from '../common';
 import { StepFactory } from './step/step-factory';
 import { WorkflowContextManager } from './workflow-context-manager/workflow-context-manager';
 
@@ -93,19 +93,27 @@ export class WorkflowsExecutionEnginePlugin
         } as any, // EsWorkflowExecution (add triggeredBy to type if needed)
       });
 
-      try {
-        const connectorExecutor = new ConnectorExecutor(
-          context.connectorCredentials,
-          await plugins.actions.getUnsecuredActionsClient()
-        );
+      const connectorExecutor = new ConnectorExecutor(
+        context.connectorCredentials,
+        await plugins.actions.getUnsecuredActionsClient()
+      );
 
-        const contextManager = new WorkflowContextManager({
-          workflowRunId,
-          workflow: workflow as any,
-          stepResults: {},
-          event: context.event,
-          esApiKey: context.esApiKey,
-        });
+      const contextManager = new WorkflowContextManager({
+        workflowRunId,
+        workflow: workflow as any,
+        stepResults: {},
+        event: context.event,
+        esApiKey: context.esApiKey,
+        // Enable workflow event logging
+        logger: this.logger,
+        workflowEventLoggerIndex: WORKFLOWS_EXECUTION_LOGS_INDEX,
+        esClient: this.esClient,
+      });
+
+      // Log workflow execution start
+      contextManager.logWorkflowStart();
+
+      try {
 
         for (const currentStep of workflow.definition.workflow.steps) {
           const step = new StepFactory().create(
@@ -169,9 +177,16 @@ export class WorkflowsExecutionEnginePlugin
         }
 
         workflowExecutionStatus = ExecutionStatus.COMPLETED;
+        // Log workflow success
+        contextManager.logWorkflowComplete(true);
       } catch (error) {
         workflowExecutionStatus = ExecutionStatus.FAILED;
         workflowExecutionError = error instanceof Error ? error.message : String(error);
+        // Log workflow failure
+        contextManager.logError('Workflow execution failed', error as Error, {
+          event: { action: 'workflow-failed', outcome: 'failure' },
+        });
+        contextManager.logWorkflowComplete(false);
       } finally {
         await this.esClient.update({
           index: WORKFLOWS_EXECUTIONS_INDEX,
