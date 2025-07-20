@@ -15,10 +15,11 @@ import {
   Logger,
   DEFAULT_APP_CATEGORIES,
 } from '@kbn/core/server';
-import { Client } from '@elastic/elasticsearch';
+
 import { IUnsecuredActionsClient } from '@kbn/actions-plugin/server';
 import { KibanaFeatureScope } from '@kbn/features-plugin/common';
 import { i18n } from '@kbn/i18n';
+import { Client } from '@elastic/elasticsearch';
 import type {
   WorkflowsManagementPluginServerDependenciesSetup,
   WorkflowsPluginSetup,
@@ -36,6 +37,7 @@ import {
   WORKFLOWS_EXECUTIONS_INDEX,
   WORKFLOWS_STEP_EXECUTIONS_INDEX,
 } from '../common';
+import { workflowSavedObjectType } from './saved_objects/workflow';
 
 /**
  * The order of appearance in the feature privilege page
@@ -103,6 +105,9 @@ export class WorkflowsPlugin implements Plugin<WorkflowsPluginSetup, WorkflowsPl
         },
       });
     }
+
+    // Register saved object types
+    core.savedObjects.registerType(workflowSavedObjectType);
 
     plugins.features?.registerKibanaFeature({
       id: 'workflowsManagement',
@@ -264,10 +269,20 @@ export class WorkflowsPlugin implements Plugin<WorkflowsPluginSetup, WorkflowsPl
     const router = core.http.createRouter();
 
     this.logger.debug('Workflows Management: Creating workflows service');
+
+    // Get ES client from core
+    const getEsClient = () => Promise.resolve(this.esClient);
+
+    // Get saved objects client from core
+    const getSavedObjectsClient = () =>
+      core
+        .getStartServices()
+        .then(([coreStart]) => coreStart.savedObjects.createInternalRepository());
+
     this.workflowsService = new WorkflowsService(
-      Promise.resolve(this.esClient),
+      getEsClient(),
       this.logger,
-      WORKFLOWS_INDEX,
+      getSavedObjectsClient,
       WORKFLOWS_EXECUTIONS_INDEX,
       WORKFLOWS_STEP_EXECUTIONS_INDEX
     );
@@ -298,7 +313,7 @@ export class WorkflowsPlugin implements Plugin<WorkflowsPluginSetup, WorkflowsPl
     }
 
     const actionsTypes = plugins.actions.getAllTypes();
-    console.log('actionsTypes', actionsTypes);
+    this.logger.debug(`Available action types: ${actionsTypes.join(', ')}`);
 
     this.logger.debug('Workflows Management: Creating scheduler service');
     this.schedulerService = new SchedulerService(
