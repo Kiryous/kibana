@@ -19,6 +19,7 @@ import {
 } from '@elastic/eui';
 import { i18n } from '@kbn/i18n';
 import { FormattedMessage } from '@kbn/i18n-react';
+import { WorkflowYaml } from '@kbn/workflows';
 import { useKibana } from '@kbn/kibana-react-plugin/public';
 import React, { useEffect, useMemo, useState } from 'react';
 import { WORKFLOW_ZOD_SCHEMA_LOOSE } from '../../../common';
@@ -33,8 +34,11 @@ import { useWorkflowUrlState } from '../../hooks/use_workflow_url_state';
 
 export function WorkflowDetailPage({ id }: { id: string }) {
   const { application, chrome, notifications } = useKibana().services;
-  const { data: workflow, isLoading: isLoadingWorkflow, error } = useWorkflowDetail(id);
-
+  const {
+    data: workflow,
+    isLoading: isLoadingWorkflow,
+    error: workflowError,
+  } = useWorkflowDetail(id);
   const [workflowEventModalOpen, setWorkflowEventModalOpen] = useState(false);
 
   chrome!.setBreadcrumbs([
@@ -131,16 +135,20 @@ export function WorkflowDetailPage({ id }: { id: string }) {
     return (
       <EuiFlexGroup>
         <EuiFlexItem>
-          <WorkflowEditor
-            workflowId={workflow?.id ?? ''}
-            value={workflowYaml}
-            onChange={handleChange}
-            hasChanges={hasChanges}
-          />
+          {workflow && (
+            <WorkflowEditor
+              workflowId={workflow?.id ?? ''}
+              value={workflowYaml}
+              onChange={handleChange}
+              hasChanges={hasChanges}
+            />
+          )}
         </EuiFlexItem>
         <EuiFlexItem>
           {/* @ts-expect-error - TODO: fix this */}
-          {workflowYamlObject?.data && <WorkflowVisualEditor workflow={workflowYamlObject.data} />}
+          {workflowYamlObject?.data && (
+            <WorkflowVisualEditor workflow={workflowYamlObject.data as WorkflowYaml} />
+          )}
         </EuiFlexItem>
       </EuiFlexGroup>
     );
@@ -156,7 +164,7 @@ export function WorkflowDetailPage({ id }: { id: string }) {
     return <EuiLoadingSpinner />;
   }
 
-  if (error) {
+  if (workflowError) {
     return <EuiText>Error loading workflow</EuiText>;
   }
 

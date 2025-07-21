@@ -154,6 +154,7 @@ export interface WorkflowDetailDto {
 }
 
 export interface WorkflowListItemDto {
+  tags: string[];
   id: string;
   name: string;
   description: string;
@@ -179,3 +180,13 @@ export type WorkflowExecutionEngineModel = Pick<
   EsWorkflow,
   'id' | 'name' | 'status' | 'definition'
 >;
+
+export interface WorkflowListItemAction {
+  isPrimary?: boolean;
+  type: string;
+  color: string;
+  name: string;
+  icon: string;
+  description: string;
+  onClick: (item: WorkflowListItemDto) => void;
+}

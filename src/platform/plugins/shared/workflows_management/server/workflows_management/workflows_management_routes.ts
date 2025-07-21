@@ -17,7 +17,7 @@ export function defineRoutes(router: IRouter, api: WorkflowsManagementApi, logge
     {
       path: '/api/workflows/{id}',
       options: {
-        tags: ['access:workflowsManagement'], // Optional but recommended
+        tags: ['access:workflowsManagement'],
       },
       security: {
         authz: {
@@ -60,7 +60,7 @@ export function defineRoutes(router: IRouter, api: WorkflowsManagementApi, logge
     {
       path: '/api/workflows/search',
       options: {
-        tags: ['access:workflowsManagement'], // Optional but recommended
+        tags: ['access:workflowsManagement'],
       },
       security: {
         authz: {
@@ -96,7 +96,7 @@ export function defineRoutes(router: IRouter, api: WorkflowsManagementApi, logge
     {
       path: '/api/workflows',
       options: {
-        tags: ['access:workflowsManagement'], // Optional but recommended
+        tags: ['access:workflowsManagement'],
       },
       security: {
         authz: {
@@ -131,7 +131,7 @@ export function defineRoutes(router: IRouter, api: WorkflowsManagementApi, logge
     {
       path: '/api/workflows/{id}',
       options: {
-        tags: ['access:workflowsManagement'], // Optional but recommended
+        tags: ['access:workflowsManagement'],
       },
       security: {
         authz: {
@@ -170,7 +170,7 @@ export function defineRoutes(router: IRouter, api: WorkflowsManagementApi, logge
       path: '/api/workflows/{id}',
 
       options: {
-        tags: ['access:workflowsManagement'], // Optional but recommended
+        tags: ['access:workflowsManagement'],
       },
       security: {
         authz: {
@@ -206,7 +206,7 @@ export function defineRoutes(router: IRouter, api: WorkflowsManagementApi, logge
     {
       path: '/api/workflows',
       options: {
-        tags: ['access:workflowsManagement'], // Optional but recommended
+        tags: ['access:workflowsManagement'],
       },
       security: {
         authz: {
@@ -242,7 +242,7 @@ export function defineRoutes(router: IRouter, api: WorkflowsManagementApi, logge
     {
       path: '/api/workflows/{id}/run',
       options: {
-        tags: ['access:workflowsManagement'], // Optional but recommended
+        tags: ['access:workflowsManagement'],
       },
       security: {
         authz: {
@@ -288,7 +288,7 @@ export function defineRoutes(router: IRouter, api: WorkflowsManagementApi, logge
     {
       path: '/api/workflowExecutions',
       options: {
-        tags: ['access:workflowsManagement'], // Optional but recommended
+        tags: ['access:workflowsManagement'],
       },
       security: {
         authz: {
@@ -325,7 +325,7 @@ export function defineRoutes(router: IRouter, api: WorkflowsManagementApi, logge
     {
       path: '/api/workflowExecutions/{workflowExecutionId}',
       options: {
-        tags: ['access:workflowsManagement'], // Optional but recommended
+        tags: ['access:workflowsManagement'],
       },
       security: {
         authz: {
