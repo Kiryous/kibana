@@ -23,12 +23,8 @@ import {
   toSentenceCase,
   useEuiTheme,
 } from '@elastic/eui';
-import { Link } from 'react-router-dom';
-import { Chart, BarSeries, ScaleType, Settings } from '@elastic/charts';
-import { ExecutionStatus, WorkflowListItemDto, WorkflowListItemAction } from '@kbn/workflows';
 import { useKibana } from '@kbn/kibana-react-plugin/public';
-import { ExecutionStatus, WorkflowListItemDto } from '@kbn/workflows';
-import React, { useCallback, useMemo, useState } from 'react';
+import { ExecutionStatus, WorkflowListItemAction, WorkflowListItemDto } from '@kbn/workflows';
 import { Link } from 'react-router-dom';
 import { useWorkflowActions } from '../../../entities/workflows/model/useWorkflowActions';
 import { useWorkflows } from '../../../entities/workflows/model/useWorkflows';
@@ -230,8 +226,6 @@ export function WorkflowList() {
       euiTheme.colors.vis.euiColorVis0,
       euiTheme.colors.vis.euiColorVis1,
       euiTheme.colors.vis.euiColorVis6,
-      handleDeleteWorkflow,
-      handleRunWorkflow,
     ]
   );
 
