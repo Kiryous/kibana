@@ -280,12 +280,23 @@ export class WorkflowsPlugin implements Plugin<WorkflowsPluginSetup, WorkflowsPl
     const router = core.http.createRouter();
 
     this.logger.debug('Workflows Management: Creating workflows service');
+
+    // Get ES client from core
+    const getEsClient = () => Promise.resolve(this.esClient);
+
+    // Get saved objects client from core
+    const getSavedObjectsClient = () =>
+      core
+        .getStartServices()
+        .then(([coreStart]) => coreStart.savedObjects.createInternalRepository());
+
     this.workflowsService = new WorkflowsService(
-      Promise.resolve(this.esClient),
+      getEsClient(),
       this.logger,
-      WORKFLOWS_INDEX,
+      getSavedObjectsClient,
       WORKFLOWS_EXECUTIONS_INDEX,
-      WORKFLOWS_STEP_EXECUTIONS_INDEX
+      WORKFLOWS_STEP_EXECUTIONS_INDEX,
+      WORKFLOWS_EXECUTION_LOGS_INDEX
     );
     this.api = new WorkflowsManagementApi(this.workflowsService);
 
