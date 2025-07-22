@@ -21,7 +21,7 @@ const FEATURE_ORDER = 3000;
 export const registerFeatures = (plugins: WorkflowsManagementPluginServerDependenciesSetup) => {
   plugins.features?.registerKibanaFeature({
     app: [],
-    category: DEFAULT_APP_CATEGORIES.management,
+    category: DEFAULT_APP_CATEGORIES.kibana,
     id: 'workflowsManagement',
     name: i18n.translate(
       'platform.plugins.shared.workflows_management.featureRegistry.workflowsManagementFeatureName',

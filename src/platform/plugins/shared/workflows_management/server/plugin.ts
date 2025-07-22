@@ -44,7 +44,7 @@ export class WorkflowsPlugin implements Plugin<WorkflowsPluginSetup, WorkflowsPl
   }
 
   public setup(core: CoreSetup, plugins: WorkflowsManagementPluginServerDependenciesSetup) {
-    this.logger.info('Workflows Management: Setup');
+    this.logger.debug('Workflows Management: Setup');
 
     // Register workflow task definition
     if (plugins.taskManager) {

@@ -42,7 +42,7 @@ const WorkflowsPermissionsWrapper = ({
   }
 
   if (!havePermissions) {
-    return <AccessDenied />;
+    return <AccessDenied requirements={permissions} />;
   }
 
   return children;

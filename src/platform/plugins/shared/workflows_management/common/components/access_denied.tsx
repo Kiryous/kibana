@@ -8,10 +8,14 @@
  */
 
 import { i18n } from '@kbn/i18n';
-import { EuiEmptyPrompt } from '@elastic/eui';
+import { EuiBadge, EuiEmptyPrompt } from '@elastic/eui';
 import React from 'react';
 
-export const AccessDenied = (): JSX.Element => {
+interface AccessDeniedParams {
+  requirements?: string[];
+}
+
+export const AccessDenied = ({ requirements }: AccessDeniedParams): JSX.Element => {
   return (
     <EuiEmptyPrompt
       iconType="securityApp"
@@ -23,11 +27,23 @@ export const AccessDenied = (): JSX.Element => {
         </h2>
       }
       body={
-        <p>
-          {i18n.translate('platform.plugins.shared.workflows_management.ui.noPermissions', {
-            defaultMessage: 'You don’t have permission to view this page.',
-          })}
-        </p>
+        <>
+          <p>
+            {i18n.translate('platform.plugins.shared.workflows_management.ui.noPermissions', {
+              defaultMessage: 'You don’t have permission to view this page:',
+            })}
+          </p>
+          <p>
+            {requirements &&
+              requirements.map((requirement) => {
+                return (
+                  <EuiBadge color="danger" key={requirement}>
+                    {requirement}
+                  </EuiBadge>
+                );
+              })}
+          </p>
+        </>
       }
     />
   );
