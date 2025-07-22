@@ -9,7 +9,7 @@
 
 import { schema } from '@kbn/config-schema';
 import { IRouter, Logger } from '@kbn/core/server';
-import { CreateWorkflowCommand, CreateWorkflowCommandSchema } from '@kbn/workflows';
+import { CreateWorkflowCommandSchema } from '@kbn/workflows';
 import { WorkflowsManagementApi, type GetWorkflowsParams } from './workflows_management_api';
 
 export function defineRoutes(router: IRouter, api: WorkflowsManagementApi, logger: Logger) {
@@ -345,7 +345,7 @@ export function defineRoutes(router: IRouter, api: WorkflowsManagementApi, logge
     async (context, request, response) => {
       try {
         const { workflowExecutionId } = request.params;
-        await api.getWorkflowExecution(workflowExecutionId);
+        const workflowExecution = await api.getWorkflowExecution(workflowExecutionId);
 
         if (!workflowExecution) {
           return response.notFound({
