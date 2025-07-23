@@ -108,14 +108,12 @@ export function defineRoutes(router: IRouter, api: WorkflowsManagementApi, logge
         },
       },
       validate: {
-        body: CreateWorkflowCommandSchema.partial(),
+        body: CreateWorkflowCommandSchema,
       },
     },
     async (context, request, response) => {
       try {
-        const createdWorkflow = await api.createWorkflow({
-          yaml: (request.body as string) || '',
-        });
+        const createdWorkflow = await api.createWorkflow(request.body);
         return response.ok({ body: createdWorkflow });
       } catch (error) {
         return response.customError({
