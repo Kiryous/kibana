@@ -3592,34 +3592,37 @@
     react-redux "^9.2.0"
     redux "^5.0.1"
 
-"@hey-api/codegen-core@^0.3.3":
-  version "0.3.3"
-  resolved "https://registry.yarnpkg.com/@hey-api/codegen-core/-/codegen-core-0.3.3.tgz#a93d2a6b338a5525fe53be42c29e2dd839122e43"
-  integrity sha512-vArVDtrvdzFewu1hnjUm4jX1NBITlSCeO81EdWq676MxQbyxsGcDPAgohaSA+Wvr4HjPSvsg2/1s2zYxUtXebg==
+"@hey-api/codegen-core@^0.4.0":
+  version "0.4.0"
+  resolved "https://registry.yarnpkg.com/@hey-api/codegen-core/-/codegen-core-0.4.0.tgz#f2f56d67ecae9fb9f2b90ced3358b25f1faa80c8"
+  integrity sha512-o8rBbEXEUhEPzrHbqImYjwIHm4Oj0r1RPS+5cp8Z66kPO7SEN7PYUgK7XpmSxoy9LPMNK1M5qmCO4cGGwT+ELQ==
+  dependencies:
+    ansi-colors "4.1.3"
+    color-support "1.1.3"
 
-"@hey-api/json-schema-ref-parser@1.2.1":
-  version "1.2.1"
-  resolved "https://registry.yarnpkg.com/@hey-api/json-schema-ref-parser/-/json-schema-ref-parser-1.2.1.tgz#7268186964bfb24beb227e2d79e514fd0dd3c775"
-  integrity sha512-inPeksRLq+j3ArnuGOzQPQE//YrhezQG0+9Y9yizScBN2qatJ78fIByhEgKdNAbtguDCn4RPxmEhcrePwHxs4A==
+"@hey-api/json-schema-ref-parser@1.2.2":
+  version "1.2.2"
+  resolved "https://registry.yarnpkg.com/@hey-api/json-schema-ref-parser/-/json-schema-ref-parser-1.2.2.tgz#9609373215dd868d42d89561c9b906c64f5d9239"
+  integrity sha512-oS+5yAdwnK20lSeFO1d53Ku+yaGCsY8PcrmSq2GtSs3bsBfRnHAbpPKSVzQcaxAOrzj5NB+f34WhZglVrNayBA==
   dependencies:
     "@jsdevtools/ono" "^7.1.3"
     "@types/json-schema" "^7.0.15"
-    js-yaml "^4.1.0"
+    js-yaml "^4.1.1"
     lodash "^4.17.21"
 
-"@hey-api/openapi-ts@0.88.0":
-  version "0.88.0"
-  resolved "https://registry.yarnpkg.com/@hey-api/openapi-ts/-/openapi-ts-0.88.0.tgz#357ac0eae7c47738c75d67440ae89d2aff04db71"
-  integrity sha512-ZrvmDfmVf+N4ry786LAhS/DoH+xkIjIJIeDnj2aL1qnMTIDsdRIXXvr80EnAZVBgunzu1wTBbHb3H9OfyDQ2EQ==
+"@hey-api/openapi-ts@0.89.2":
+  version "0.89.2"
+  resolved "https://registry.yarnpkg.com/@hey-api/openapi-ts/-/openapi-ts-0.89.2.tgz#a2a73ac152474527a16825d6996a25e0342d0a53"
+  integrity sha512-iEhWfvPbzfcS7BMqHzh2FbMG1ouZVAHwHoYhq/61Rmq/r1Q1NgCZ3xy6QuXZgbTdHe9enMjWXjINLnTj57kWwA==
   dependencies:
-    "@hey-api/codegen-core" "^0.3.3"
-    "@hey-api/json-schema-ref-parser" "1.2.1"
+    "@hey-api/codegen-core" "^0.4.0"
+    "@hey-api/json-schema-ref-parser" "1.2.2"
     ansi-colors "4.1.3"
     c12 "3.3.2"
     color-support "1.1.3"
     commander "14.0.2"
     open "11.0.0"
-    semver "7.7.2"
+    semver "7.7.3"
 
 "@hono/node-server@1.19.14", "@hono/node-server@^1.19.9":
   version "1.19.14"
@@ -31194,10 +31197,10 @@ semver@7.6.3:
   resolved "https://registry.yarnpkg.com/semver/-/semver-7.6.3.tgz#980f7b5550bc175fb4dc09403085627f9eb33143"
   integrity sha512-oVekP1cKtI+CTDvHWYFUcMtsK/00wmAEfyqKfNdARm8u1wNVhSgaX7A8d4UuIlUI5e84iEwOhs7ZPYRmzU9U6A==
 
-semver@7.7.2:
-  version "7.7.2"
-  resolved "https://registry.yarnpkg.com/semver/-/semver-7.7.2.tgz#67d99fdcd35cec21e6f8b87a7fd515a33f982b58"
-  integrity sha512-RF0Fw+rO5AMf9MAyaRXI4AV0Ulj5lMHqVxxdSgiVbixSCXoEmmX/jk0CuJw4+3SqroYO9VoUh+HcuJivvtJemA==
+semver@7.7.3, semver@^7.3.2, semver@^7.3.5, semver@^7.3.7, semver@^7.5.0, semver@^7.5.2, semver@^7.5.3, semver@^7.5.4, semver@^7.6.0, semver@^7.6.2, semver@^7.6.3, semver@^7.7.1, semver@^7.7.2, semver@^7.7.3:
+  version "7.7.3"
+  resolved "https://registry.yarnpkg.com/semver/-/semver-7.7.3.tgz#4b5f4143d007633a8dc671cd0a6ef9147b8bb946"
+  integrity sha512-SdsKMrI9TdgjdweUSR9MweHA4EJ8YxHn8DFaDisvhVlUOe4BF1tLD7GAj0lIqWVl+dPb/rExr0Btby5loQm20Q==
 
 semver@7.7.4, semver@^7.3.2, semver@^7.3.5, semver@^7.3.7, semver@^7.5.0, semver@^7.5.2, semver@^7.5.3, semver@^7.5.4, semver@^7.6.0, semver@^7.6.2, semver@^7.6.3, semver@^7.7.1, semver@^7.7.2, semver@^7.7.3, semver@^7.7.4:
   version "7.7.4"
