@@ -71,6 +71,10 @@ export function transformQRadarRuleToOriginalRule(qradarRule: QradarRule): Origi
   const ruleData = Array.isArray(qradarRule.rule_data)
     ? qradarRule.rule_data[0]
     : qradarRule.rule_data;
+  const title = Array.isArray(qradarRule.title) ? qradarRule.title[0] : qradarRule.title;
+  const description = Array.isArray(qradarRule.description)
+    ? qradarRule.description[0]
+    : qradarRule.description;
 
   if (!id) {
     throw new Error('QRadar rule is missing required field: id');
@@ -83,9 +87,9 @@ export function transformQRadarRuleToOriginalRule(qradarRule: QradarRule): Origi
   const originalRule: OriginalRule = {
     id,
     vendor: 'qradar',
-    title: qradarRule.title,
-    description: qradarRule.description, // QRadar rules may not have a description field in the export
-    query: qradarRule.rule_data, // Store the decoded XML in the query field
+    title,
+    description, // QRadar rules may not have a description field in the export
+    query: ruleData, // Store the decoded XML in the query field
     query_language: 'xml',
   };
 

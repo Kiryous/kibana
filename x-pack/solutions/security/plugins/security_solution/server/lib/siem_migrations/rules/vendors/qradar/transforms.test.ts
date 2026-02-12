@@ -318,9 +318,6 @@ describe('QRadar transforms', () => {
       expect(result.id).toBe('rule-456');
     });
 
-    // NOTE: The following tests expose a bug in the implementation where line 87
-    // uses qradarRule.rule_data instead of the extracted ruleData variable.
-    // The function extracts the first element from arrays (line 70-72) but doesn't use it.
     it('should handle QRadar rule with array-wrapped rule_data', () => {
       const qradarRule: QradarRule = {
         id: 'rule-789',
@@ -332,8 +329,7 @@ describe('QRadar transforms', () => {
 
       const result = transformQRadarRuleToOriginalRule(qradarRule);
 
-      // BUG: This should extract the first element but currently returns the array
-      expect(result.query).toEqual([SIMPLE_XML]);
+      expect(result.query).toBe(SIMPLE_XML);
     });
 
     it('should handle QRadar rule with both id and rule_data as arrays', () => {
@@ -348,8 +344,52 @@ describe('QRadar transforms', () => {
       const result = transformQRadarRuleToOriginalRule(qradarRule);
 
       expect(result.id).toBe('rule-999');
-      // BUG: This should extract the first element but currently returns the array
-      expect(result.query).toEqual([SIMPLE_XML]);
+      expect(result.query).toBe(SIMPLE_XML);
+    });
+
+    it('should handle QRadar rule with array-wrapped title', () => {
+      const qradarRule: QradarRule = {
+        id: QRADAR_RULE_ID,
+        title: ['Array Title'] as unknown as string,
+        description: TEST_RULE_DESCRIPTION,
+        rule_data: SIMPLE_XML,
+        rule_type: RULE_TYPE_CUSTOM,
+      };
+
+      const result = transformQRadarRuleToOriginalRule(qradarRule);
+
+      expect(result.title).toBe('Array Title');
+    });
+
+    it('should handle QRadar rule with array-wrapped description', () => {
+      const qradarRule: QradarRule = {
+        id: QRADAR_RULE_ID,
+        title: TEST_RULE_TITLE,
+        description: ['Array Description'] as unknown as string,
+        rule_data: SIMPLE_XML,
+        rule_type: RULE_TYPE_CUSTOM,
+      };
+
+      const result = transformQRadarRuleToOriginalRule(qradarRule);
+
+      expect(result.description).toBe('Array Description');
+    });
+
+    it('should handle QRadar rule with all fields as arrays (xml2js format)', () => {
+      const qradarRule: QradarRule = {
+        id: ['rule-all-arrays'] as unknown as string,
+        title: ['All Arrays Title'] as unknown as string,
+        description: ['All Arrays Description'] as unknown as string,
+        rule_data: [SIMPLE_XML] as unknown as string,
+        rule_type: RULE_TYPE_CUSTOM,
+      };
+
+      const result = transformQRadarRuleToOriginalRule(qradarRule);
+
+      expect(result.id).toBe('rule-all-arrays');
+      expect(result.title).toBe('All Arrays Title');
+      expect(result.description).toBe('All Arrays Description');
+      expect(result.query).toBe(SIMPLE_XML);
     });
 
     it('should throw error when id is missing', () => {
