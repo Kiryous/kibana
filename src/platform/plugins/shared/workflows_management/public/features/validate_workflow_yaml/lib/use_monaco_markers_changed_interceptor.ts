@@ -9,6 +9,7 @@
 
 import { useCallback, useState } from 'react';
 import type YAML from 'yaml';
+import { parseDocument } from 'yaml';
 import type { monaco } from '@kbn/monaco';
 import type { z } from '@kbn/zod/v4';
 import { filterMonacoYamlMarkers } from './filter_monaco_yaml_markers';
@@ -48,19 +49,26 @@ export function useMonacoMarkersChangedInterceptor({
       owner: string,
       markers: monaco.editor.IMarkerData[]
     ) => {
-      return filterMonacoYamlMarkers(markers, editorModel, yamlDocumentRef.current).map(
-        (marker) => {
-          if (owner === 'yaml') {
-            return formatMonacoYamlMarker(
-              marker,
-              editorModel,
-              workflowYamlSchema,
-              yamlDocumentRef.current
-            );
-          }
-          return marker;
+      // Parse a fresh YAML document from the current editor content to avoid
+      // stale yamlDocumentRef issues where offsets don't match marker positions
+      let currentDocument: YAML.Document | null = yamlDocumentRef.current;
+      try {
+        currentDocument = parseDocument(editorModel.getValue());
+      } catch {
+        // Fall back to the ref if parsing fails
+      }
+
+      return filterMonacoYamlMarkers(markers, editorModel, currentDocument).map((marker) => {
+        if (owner === 'yaml') {
+          return formatMonacoYamlMarker(
+            marker,
+            editorModel,
+            workflowYamlSchema,
+            currentDocument
+          );
         }
-      );
+        return marker;
+      });
     },
     [workflowYamlSchema, yamlDocumentRef]
   );

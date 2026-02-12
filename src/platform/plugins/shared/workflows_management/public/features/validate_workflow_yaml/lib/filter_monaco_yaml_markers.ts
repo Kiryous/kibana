@@ -8,7 +8,7 @@
  */
 
 import type YAML from 'yaml';
-import { isScalar } from 'yaml';
+import { isScalar, parseDocument } from 'yaml';
 import type { monaco } from '@kbn/monaco';
 import { isDynamicValue, isLiquidTagValue, isVariableValue } from '../../../../common/lib/regex';
 import { getScalarValueAtOffset } from '../../../../common/lib/yaml/get_scalar_value_at_offset';
@@ -18,15 +18,26 @@ export function filterMonacoYamlMarkers(
   editorModel: monaco.editor.ITextModel,
   yamlDocument: YAML.Document | null
 ): monaco.editor.IMarkerData[] {
+  // Parse a fresh YAML document from the current editor content to ensure
+  // offsets are in sync with the markers. The provided yamlDocument may be
+  // stale (not yet updated to reflect the latest editor text), causing
+  // getScalarValueAtOffset to look up wrong positions and miss template variables.
+  let currentDocument = yamlDocument;
+  try {
+    currentDocument = parseDocument(editorModel.getValue());
+  } catch {
+    // Fall back to the provided document if parsing fails
+  }
+
   return markers.filter((marker) => {
-    if (marker.source && marker.source.startsWith('yaml-schema:') && yamlDocument) {
+    if (marker.source && marker.source.startsWith('yaml-schema:') && currentDocument) {
       try {
         const markerOffset = editorModel.getOffsetAt({
           lineNumber: marker.startLineNumber,
           column: marker.startColumn,
         });
 
-        const scalarNode = getScalarValueAtOffset(yamlDocument, markerOffset);
+        const scalarNode = getScalarValueAtOffset(currentDocument, markerOffset);
         if (
           scalarNode &&
           isScalar(scalarNode) &&
