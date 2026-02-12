@@ -40,7 +40,7 @@ export function getWorkflowJsonSchema(zodSchema: z.ZodType): z.core.JSONSchema.J
       }
     }
 
-    return z.toJSONSchema(schemaToConvert, {
+    const jsonSchema = z.toJSONSchema(schemaToConvert, {
       target: 'draft-7',
       unrepresentable: 'any', // do not throw an error for unrepresentable types
       reused: 'ref', // using ref reduces the size of the schema 4x
@@ -50,10 +50,43 @@ export function getWorkflowJsonSchema(zodSchema: z.ZodType): z.core.JSONSchema.J
         setMarkdownDescriptionIfSyntaxDetected(ctx);
       },
     });
+
+    return resolveRootDefinitionRef(jsonSchema);
   } catch (error) {
     // console.error('Error generating JSON schema from YAML schema:', error);
     return null;
   }
+}
+
+function resolveRootDefinitionRef(
+  jsonSchema: z.core.JSONSchema.JSONSchema
+): z.core.JSONSchema.JSONSchema {
+  const schemaWithRef = jsonSchema as {
+    $ref?: string;
+    definitions?: Record<string, unknown>;
+    $schema?: string;
+  };
+
+  if (!schemaWithRef.$ref || !schemaWithRef.definitions) {
+    return jsonSchema;
+  }
+
+  if (!schemaWithRef.$ref.startsWith('#/definitions/')) {
+    return jsonSchema;
+  }
+
+  const definitionName = schemaWithRef.$ref.replace('#/definitions/', '');
+  const rootDefinition = schemaWithRef.definitions[definitionName];
+
+  if (!rootDefinition || typeof rootDefinition !== 'object') {
+    return jsonSchema;
+  }
+
+  return {
+    ...(rootDefinition as Record<string, unknown>),
+    definitions: schemaWithRef.definitions,
+    $schema: schemaWithRef.$schema,
+  } as z.core.JSONSchema.JSONSchema;
 }
 
 // this function MODIFIES the jsonSchema in place
