@@ -93,7 +93,6 @@ test.describe(
     test('should show step type autocompletion suggestions', async ({ pageObjects, page }) => {
       await pageObjects.workflowEditor.gotoNewWorkflow();
       const workflowName = 'Autocomplete Test';
-      await pageObjects.workflowEditor.setYamlEditorValue(getIncompleteStepTypeYaml(workflowName));
 
       // Set incomplete YAML with empty step type
       await pageObjects.workflowEditor.setYamlEditorValue(getIncompleteStepTypeYaml(workflowName));
@@ -130,6 +129,34 @@ test.describe(
       await page.keyboard.type('ind');
 
       await expect(suggestWidget.getByRole('option', { name: 'index' })).toBeVisible();
+      await suggestWidget.getByRole('option', { name: 'index' }).click();
+      await page.keyboard.type(' "alerts-*"');
+      await page.keyboard.press('Enter');
+      await page.keyboard.type('query: {"match_all": {}}');
+      await page.keyboard.press('Enter');
+      // TODO: we need more robust way to wait for the changes to be synced
+      await page.waitForTimeout(600);
+      await pageObjects.workflowEditor.waitForYamlChangesSynced();
+
+      // open the actions menu
+      await page.keyboard.press('Control+K');
+      await page.testSubj.waitForSelector('workflowActionsMenu', { state: 'visible' });
+      await page.keyboard.type('Slack');
+      await page.keyboard.press('Enter');
+      await page.getByText('message: ""').click();
+      await page.keyboard.press('End');
+      await page.keyboard.press('ArrowLeft');
+      await page.keyboard.type('@');
+      await expect(suggestWidget).toBeVisible();
+      await suggestWidget.getByRole('option', { name: 'steps' }).click();
+      await page.keyboard.press('Enter');
+      await page.keyboard.type('.');
+      await expect(suggestWidget).toBeVisible();
+      await suggestWidget.getByRole('option', { name: 'hello_world_step' }).click();
+      await page.keyboard.press('Enter');
+      await page.keyboard.type('.');
+      await expect(suggestWidget).toBeVisible();
+      await suggestWidget.getByRole('option', { name: 'output' }).click();
     });
   }
 );

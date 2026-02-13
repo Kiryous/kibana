@@ -102,6 +102,11 @@ export class WorkflowEditorPage {
     );
   }
 
+  async waitForYamlChangesSynced() {
+    // TODO: we need more robust way to wait for the changes to be synced
+    await this.saveButton.isEnabled();
+  }
+
   public getYamlEditorSuggestWidget() {
     return this.page.locator(
       '[data-test-subj="kbnCodeEditorEditorOverflowWidgetsContainer"] .suggest-widget'

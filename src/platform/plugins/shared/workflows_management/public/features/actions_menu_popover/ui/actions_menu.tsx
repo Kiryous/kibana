@@ -155,6 +155,7 @@ export function ActionsMenu({ onActionSelected }: ActionsMenuProps) {
 
   return (
     <EuiSelectable
+      data-test-subj="workflowActionsMenu"
       aria-label="Selectable example with custom list items"
       searchable
       options={options as EuiSelectableOption<ActionOptionData>[]}
