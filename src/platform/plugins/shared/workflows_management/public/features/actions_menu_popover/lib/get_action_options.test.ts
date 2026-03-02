@@ -8,7 +8,7 @@
  */
 
 import type { EuiThemeComputed } from '@elastic/eui';
-import { isDynamicConnector } from '@kbn/workflows';
+import { isDynamicConnector, StepCategory } from '@kbn/workflows';
 import type { WorkflowsExtensionsPublicPluginStart } from '@kbn/workflows-extensions/public';
 import { z } from '@kbn/zod/v4';
 import { flattenOptions, getActionOptions } from './get_action_options';
@@ -25,6 +25,14 @@ jest.mock('../../../trigger_schemas', () => ({
 }));
 jest.mock('@kbn/workflows', () => ({
   isDynamicConnector: jest.fn(),
+  StepCategory: {
+    Elasticsearch: 'elasticsearch',
+    External: 'external',
+    Ai: 'ai',
+    Kibana: 'kibana',
+    Data: 'data',
+    FlowControl: 'flowControl',
+  },
 }));
 jest.mock('../../../shared/ui/step_icons/get_step_icon_type', () => ({
   getStepIconType: jest.fn(),
@@ -116,7 +124,7 @@ describe('getActionOptions', () => {
       label: 'Custom Connector Label',
       description: 'Custom Connector Description',
       icon: 'customIcon',
-      actionsMenuCatalog: 'kibana' as const,
+      category: StepCategory.Kibana,
       inputSchema: z.object({}),
       outputSchema: z.object({}),
     };
@@ -292,7 +300,7 @@ describe('getActionOptions', () => {
     }
   });
 
-  it('should use default catalog when custom step definition has no catalog', () => {
+  it('should add connectors to the correct group based on category', () => {
     const mockConnector = {
       type: 'custom.connector',
       description: 'Custom Connector',
@@ -303,6 +311,7 @@ describe('getActionOptions', () => {
       label: 'Custom Connector Label',
       description: 'Custom Connector Description',
       icon: 'customIcon',
+      category: StepCategory.External,
       inputSchema: z.object({}),
       outputSchema: z.object({}),
     };
@@ -311,11 +320,12 @@ describe('getActionOptions', () => {
     mockWorkflowsExtensions.getStepDefinition.mockReturnValue(mockStepDefinition as any);
 
     const result = getActionOptions(mockEuiTheme, mockWorkflowsExtensions);
-    const kibanaGroup = result.find((group) => group.id === 'kibana');
+    const externalGroup = result.find((group) => group.id === 'external');
 
-    expect(kibanaGroup).toBeDefined();
-    if (kibanaGroup && isActionGroup(kibanaGroup)) {
-      expect(kibanaGroup.options).toHaveLength(1);
+    expect(externalGroup).toBeDefined();
+    if (externalGroup && isActionGroup(externalGroup)) {
+      expect(externalGroup.options).toHaveLength(1);
+      expect(externalGroup.options[0].id).toBe('custom.connector');
     }
   });
 });
