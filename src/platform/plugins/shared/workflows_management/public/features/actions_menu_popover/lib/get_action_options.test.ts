@@ -24,15 +24,8 @@ jest.mock('../../../trigger_schemas', () => ({
   triggerSchemas: { getTriggerDefinitions: jest.fn(() => []) },
 }));
 jest.mock('@kbn/workflows', () => ({
+  ...jest.requireActual('@kbn/workflows'),
   isDynamicConnector: jest.fn(),
-  StepCategory: {
-    Elasticsearch: 'elasticsearch',
-    External: 'external',
-    Ai: 'ai',
-    Kibana: 'kibana',
-    Data: 'data',
-    FlowControl: 'flowControl',
-  },
 }));
 jest.mock('../../../shared/ui/step_icons/get_step_icon_type', () => ({
   getStepIconType: jest.fn(),
