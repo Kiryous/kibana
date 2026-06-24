@@ -44,4 +44,18 @@ describe('workflow error classes', () => {
       expect(error.message).toBe(expectedMessage);
     }
   );
+
+  it.each<{ create: () => Error; expectedName: string }>([
+    {
+      create: () => new WorkflowNotFoundError('wf-123'),
+      expectedName: 'WorkflowNotFoundError',
+    },
+    {
+      create: () => new WorkflowDisabledError('wf-123'),
+      expectedName: 'WorkflowDisabledError',
+    },
+  ])('$expectedName is flagged as a user error', ({ create }) => {
+    const error = create();
+    expect(error).toHaveProperty('isUserError', true);
+  });
 });
