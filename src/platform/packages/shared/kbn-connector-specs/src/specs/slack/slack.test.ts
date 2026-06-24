@@ -52,7 +52,6 @@ describe('Slack', () => {
       typeof t === 'string' ? t : t.type
     );
     expect(types).toContain('oauth_authorization_code');
-    expect(types).not.toContain('bearer');
   });
 
   it('supports oauth_authorization_code with correct Slack defaults', () => {
@@ -94,6 +93,20 @@ describe('Slack', () => {
         meta: { scope: { disabled: true } },
       },
     });
+  });
+
+  it('supports bearer auth type for direct token usage', () => {
+    const types = (Slack.auth?.types as Array<string | { type: string }>).map((t) =>
+      typeof t === 'string' ? t : t.type
+    );
+    expect(types).toContain('bearer');
+  });
+
+  it('declares bearer auth as a string shorthand (no per-connector defaults)', () => {
+    const bearerType = (Slack.auth?.types as Array<string | { type: string }>).find(
+      (t) => (typeof t === 'string' ? t : t.type) === 'bearer'
+    );
+    expect(bearerType).toBe('bearer');
   });
 
   describe('searchMessages action', () => {
