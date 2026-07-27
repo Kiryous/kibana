@@ -141,12 +141,16 @@ handle all of them before timings mean anything:
   bootstrap dies with no markers. Setting `CHROMEDRIVER_SKIP_DOWNLOAD=true`, `CYPRESS_INSTALL_BINARY=0`,
   `GECKODRIVER_SKIP_DOWNLOAD=true`, `PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1` via the config `env` block
   makes bootstrap pass. Docker, Modal, and Cloud Run Jobs have open egress and need none of these.
-- **L5 at the 16 GB "large" tier OOM-kills the Kibana dev optimizer** unless ES heap is capped.
-  `node scripts/es snapshot` defaults ES to ~50 % of container RAM (~8 GB); the dev optimizer then
-  spawns one worker per ~2 cores (6 workers at 8 vCPU) and the sum exceeds 16 GB, so a worker exits
-  with `code null` (SIGKILL) and Kibana never reaches `/api/status`. Cap it via the config `env`
-  block: `ES_JAVA_OPTS="-Xms2g -Xmx2g"` (dev ES needs nothing near 8 GB) and, for headroom,
-  `KBN_OPTIMIZER_MAX_WORKERS=4`.
+- **L5's Kibana dev optimizer worker crashes on the big bundles unless its V8 heap is raised.**
+  Building `lens` (~1864 modules) an optimizer worker hits its JS heap limit and exits with
+  `code null` (V8 "Reached heap limit" — a native stack of hex addresses in the log). This is the
+  *worker process* heap, not container RAM (reproduced with 22 GB container and <3 GB used), so
+  bumping the instance size does nothing on its own. The optimizer forks workers with `...process.env`,
+  so `NODE_OPTIONS` does reach them. Confirmed-green config on an 8 vCPU box (via the config `env`
+  block): `NODE_OPTIONS="--max-old-space-size=12288"` **and** `KBN_OPTIMIZER_MAX_WORKERS=2` (fewer
+  workers so two 12 GB heaps fit), plus `ES_JAVA_OPTS="-Xms2g -Xmx2g"` (dev ES defaults to ~50 % of
+  RAM and otherwise starves the box). With that, L5 greens in ~9 min; `--max-old-space-size=8192`
+  or the default 4-worker layout still OOM-crashed a worker.
 
 ## Harness architecture
 
