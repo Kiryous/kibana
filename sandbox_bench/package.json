@@ -1,0 +1,12 @@
+{
+  "name": "kibana-sandbox-bench",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "description": "Dependencies for the ComputeSDK-backed benchmark adapters (vercel, modal).",
+  "dependencies": {
+    "computesdk": "*",
+    "@computesdk/vercel": "*",
+    "@computesdk/modal": "*"
+  }
+}

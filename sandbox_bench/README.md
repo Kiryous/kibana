@@ -134,6 +134,19 @@ handle all of them before timings mean anything:
   `PLAYWRIGHT_BROWSERS_PATH` (world-readable, or owned by the task user).
 - **CA bundles and proxy env must survive the root→user switch**: corporate/proxied sandboxes
   that keep the CA bundle under `/root` break every TLS download for the unprivileged user.
+- **Some providers restrict egress to browser-binary CDNs and *kill the sandbox* rather than
+  failing the download.** Vercel Sandbox reaches github.com and registry.npmjs.org fine, but the
+  chromedriver / cypress / geckodriver postinstall downloads (chrome-for-testing endpoints,
+  `download.cypress.io`) terminate the whole microVM (`runCommand` throws "terminated"), so L2
+  bootstrap dies with no markers. Setting `CHROMEDRIVER_SKIP_DOWNLOAD=true`, `CYPRESS_INSTALL_BINARY=0`,
+  `GECKODRIVER_SKIP_DOWNLOAD=true`, `PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1` via the config `env` block
+  makes bootstrap pass. Docker, Modal, and Cloud Run Jobs have open egress and need none of these.
+- **L5 at the 16 GB "large" tier OOM-kills the Kibana dev optimizer** unless ES heap is capped.
+  `node scripts/es snapshot` defaults ES to ~50 % of container RAM (~8 GB); the dev optimizer then
+  spawns one worker per ~2 cores (6 workers at 8 vCPU) and the sum exceeds 16 GB, so a worker exits
+  with `code null` (SIGKILL) and Kibana never reaches `/api/status`. Cap it via the config `env`
+  block: `ES_JAVA_OPTS="-Xms2g -Xmx2g"` (dev ES needs nothing near 8 GB) and, for headroom,
+  `KBN_OPTIMIZER_MAX_WORKERS=4`.
 
 ## Harness architecture
 

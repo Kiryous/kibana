@@ -13,14 +13,37 @@
       "provider": "e2b",
       "providerOptions": {},
       "createOptions": {}
+    },
+    "vercel": {
+      "//": "Auth via VERCEL_TOKEN env; teamId/projectId here or via VERCEL_TEAM_ID/VERCEL_PROJECT_ID.",
+      "providerOptions": { "teamId": "team_xxx", "projectId": "prj_xxx" },
+      "createOptions": {},
+      "//egress": "L2+ needs skip-download env vars (see README checklist) — put them in .env / config env."
+    },
+    "modal": {
+      "//": "Auth via ~/.modal.toml (default active profile) or MODAL_TOKEN_ID/MODAL_TOKEN_SECRET.",
+      "providerOptions": {},
+      "createOptions": { "templateId": "buildpack-deps:bookworm" }
+    },
+    "namespace": {
+      "//": "Auth via NAMESPACE_TOKEN env = single-line {\"bearer_token\":\"nsrt_...\"} from `nsc token create --output token` (grant instance create/get/list/wait/ssh/exec/refresh/destroy).",
+      "region": "eu",
+      "duration": "3h",
+      "image": "buildpack-deps:bookworm"
+    },
+    "cloudrun": {
+      "//": "Uses active gcloud project if project omitted. Jobs model: fixed cpu/memory for all levels.",
+      "region": "europe-west1",
+      "image": "buildpack-deps:bookworm",
+      "cpu": "8",
+      "memory": "32Gi"
     }
   },
   "pricingPerHourUsd": {
     "docker": 0,
-    "e2b": null,
-    "daytona": null,
+    "vercel": null,
     "modal": null,
     "namespace": null,
-    "gcp": null
+    "cloudrun": null
   }
 }
