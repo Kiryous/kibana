@@ -27,18 +27,17 @@ import {
   forLoopValidationWorkflowDefinition,
 } from './__fixtures__/for_loop_validation_workflow';
 import { validateLiquidForLoopCollections } from './validate_liquid_for_loop_collections';
-import { createFakeMonacoModel } from '../../../../common/mocks/monaco_model';
-import { getContextSchemaForStep } from '../../workflow_context/lib/get_context_for_path';
+import { positionAt } from './__fixtures__/text_position';
+import { getContextSchemaForStep } from '../context/get_context_for_path';
 import {
   FOREACH_ITEM_SCHEMA_DESC,
   getForeachCollectionDiagnostic,
   getForeachItemSchema,
-} from '../../workflow_context/lib/get_foreach_state_schema';
-import { getWorkflowContextSchema } from '../../workflow_context/lib/get_workflow_context_schema';
+} from '../context/get_foreach_state_schema';
+import { getWorkflowContextSchema } from '../context/get_workflow_context_schema';
 
 describe('validateLiquidForLoopCollections', () => {
   const yamlDocument = parseDocument(FOR_LOOP_VALIDATION_YAML);
-  const model = createFakeMonacoModel(FOR_LOOP_VALIDATION_YAML);
   const workflowGraph = WorkflowGraph.fromWorkflowDefinition(forLoopValidationWorkflowDefinition);
 
   let results: ReturnType<typeof validateLiquidForLoopCollections>;
@@ -59,13 +58,17 @@ describe('validateLiquidForLoopCollections', () => {
 
     const nonExistingError = results.find((r) => r.message?.includes(collectionPath));
     expect(nonExistingError).toBeDefined();
-    expect(nonExistingError?.startLineNumber).toBe(model.getPositionAt(yamlOffset).lineNumber);
-    expect(nonExistingError?.startColumn).toBe(model.getPositionAt(yamlOffset).column);
+    expect(nonExistingError?.startLineNumber).toBe(
+      positionAt(FOR_LOOP_VALIDATION_YAML, yamlOffset).lineNumber
+    );
+    expect(nonExistingError?.startColumn).toBe(
+      positionAt(FOR_LOOP_VALIDATION_YAML, yamlOffset).column
+    );
     expect(nonExistingError?.endLineNumber).toBe(
-      model.getPositionAt(yamlOffset + collectionPath.length).lineNumber
+      positionAt(FOR_LOOP_VALIDATION_YAML, yamlOffset + collectionPath.length).lineNumber
     );
     expect(nonExistingError?.endColumn).toBe(
-      model.getPositionAt(yamlOffset + collectionPath.length).column
+      positionAt(FOR_LOOP_VALIDATION_YAML, yamlOffset + collectionPath.length).column
     );
   });
 
@@ -92,7 +95,6 @@ steps:
   it('reports collection error on block-folded message field with marker position', () => {
     const collectionPath = 'steps.non_existing_step';
     const foldedDoc = parseDocument(FOR_LOOP_FOLDED_ONLY_YAML);
-    const foldedModel = createFakeMonacoModel(FOR_LOOP_FOLDED_ONLY_YAML);
     const foldedGraph = WorkflowGraph.fromWorkflowDefinition(forLoopFoldedOnlyWorkflowDefinition);
     const yamlOffset = FOR_LOOP_FOLDED_ONLY_YAML.indexOf(collectionPath);
     expect(yamlOffset).toBeGreaterThan(-1);
@@ -107,8 +109,12 @@ steps:
     const badCollection = foldedResults.find((r) => r.message?.includes(collectionPath));
     expect(badCollection).toBeDefined();
     expect(badCollection?.severity).toBe('error');
-    expect(badCollection?.startLineNumber).toBe(foldedModel.getPositionAt(yamlOffset).lineNumber);
-    expect(badCollection?.startColumn).toBe(foldedModel.getPositionAt(yamlOffset).column);
+    expect(badCollection?.startLineNumber).toBe(
+      positionAt(FOR_LOOP_FOLDED_ONLY_YAML, yamlOffset).lineNumber
+    );
+    expect(badCollection?.startColumn).toBe(
+      positionAt(FOR_LOOP_FOLDED_ONLY_YAML, yamlOffset).column
+    );
   });
 
   it('reports nested inner collection error without error on valid outer collection', () => {

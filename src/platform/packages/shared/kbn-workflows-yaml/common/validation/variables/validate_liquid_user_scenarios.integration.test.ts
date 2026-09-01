@@ -10,10 +10,10 @@
 import { parseDocument } from 'yaml';
 import type { WorkflowYaml } from '@kbn/workflows';
 import { WorkflowGraph } from '@kbn/workflows/graph';
-import { matchAllVariables } from '@kbn/workflows-yaml';
+import { matchAllVariables } from '../../regex';
 import { validateLiquidForLoopCollections } from './validate_liquid_for_loop_collections';
 import { validateVariables } from './validate_variables';
-import { createFakeMonacoModel } from '../../../../common/mocks/monaco_model';
+import { positionAt } from './__fixtures__/text_position';
 
 interface ScenarioDefinition {
   readonly yaml: string;
@@ -23,7 +23,6 @@ interface ScenarioDefinition {
 
 function assertScenarioPassesValidation(scenario: ScenarioDefinition): void {
   const doc = parseDocument(scenario.yaml);
-  const model = createFakeMonacoModel(scenario.yaml);
   const graph = WorkflowGraph.fromWorkflowDefinition(scenario.definition);
 
   const collectionResults = validateLiquidForLoopCollections(
@@ -39,8 +38,8 @@ function assertScenarioPassesValidation(scenario: ScenarioDefinition): void {
     const match = matchAllVariables(scenario.yaml).find((m) => m.groups.key === key);
     expect(match).toBeDefined();
     const offset = match!.index ?? 0;
-    const start = model.getPositionAt(offset);
-    const end = model.getPositionAt(offset + match![0].length);
+    const start = positionAt(scenario.yaml, offset);
+    const end = positionAt(scenario.yaml, offset + match![0].length);
     return {
       id: `${key}-var`,
       type: 'regexp' as const,
@@ -149,7 +148,6 @@ steps:
       steps: [{ name: 'summarize', type: 'console', with: { message: 'x' } }],
     } satisfies WorkflowYaml;
     const doc = parseDocument(yaml);
-    const model = createFakeMonacoModel(yaml);
     const graph = WorkflowGraph.fromWorkflowDefinition(definition);
 
     const collectionResults = validateLiquidForLoopCollections(yaml, doc, graph, definition);
@@ -158,8 +156,8 @@ steps:
     const match = matchAllVariables(yaml).find((m) => m.groups?.key === 'row.typo');
     expect(match).toBeDefined();
     const offset = match!.index ?? 0;
-    const start = model.getPositionAt(offset);
-    const end = model.getPositionAt(offset + match![0].length);
+    const start = positionAt(yaml, offset);
+    const end = positionAt(yaml, offset + match![0].length);
 
     const variableResults = validateVariables(
       [

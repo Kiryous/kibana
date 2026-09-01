@@ -14,6 +14,7 @@ import type {
   PluginInitializerContext,
 } from '@kbn/core/server';
 
+import { setWorkflowContextRegistry } from '@kbn/workflows-yaml';
 import { defineRoutes } from './api/routes';
 import { WorkflowManagementAuditLog } from './api/routes/utils/workflow_audit_logging';
 import { WorkflowsManagementApi } from './api/workflows_management_api';
@@ -38,6 +39,7 @@ import type {
   WorkflowsServerPluginStartDeps,
 } from './types';
 import { registerUISettings } from './ui_settings';
+import { createWorkflowContextRegistry } from '../common/lib/create_workflow_context_registry';
 import { stepSchemas } from '../common/step_schemas';
 
 export class WorkflowsPlugin
@@ -127,6 +129,7 @@ export class WorkflowsPlugin
     this.workflowsService?.setStopping(false);
 
     stepSchemas.initialize(plugins.workflowsExtensions);
+    setWorkflowContextRegistry(createWorkflowContextRegistry(plugins.workflowsExtensions));
 
     if (this.api) {
       this.availabilityUpdater = new AvailabilityUpdater({
