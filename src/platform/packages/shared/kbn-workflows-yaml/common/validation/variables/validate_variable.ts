@@ -26,13 +26,26 @@ export interface VariableValidationOptions {
    * over one document so each step context is built once.
    */
   stepContextResolver?: StepContextResolver;
+  /**
+   * Editor presentation. When false no hover text is built, and a variable that
+   * resolves cleanly produces no result at all: the server reports diagnostics
+   * only, and building hover text for every valid variable is the bulk of the
+   * work on a large workflow.
+   *
+   * @default true
+   */
+  includeEditorDecorations?: boolean;
 }
 
 export function validateVariable(
   variableItem: VariableItem,
-  context: typeof DynamicStepContextSchema
-): YamlValidationResult {
+  context: typeof DynamicStepContextSchema,
+  options?: VariableValidationOptions
+): YamlValidationResult | null {
   const { key, type } = variableItem;
+  const withDecorations = options?.includeEditorDecorations !== false;
+  const hoverMessageFor = (propertyPath: string, schema: z.ZodType) =>
+    withDecorations ? getVariableHoverMessage(propertyPath, schema) : null;
 
   const parsedPath = parseVariablePath(key);
 
@@ -46,8 +59,11 @@ export function validateVariable(
           severity: 'warning',
           owner: 'variable-validation',
           ruleId: 'foreachItemRuntimeType',
-          hoverMessage: getVariableHoverMessage(key, itemSchema),
+          hoverMessage: hoverMessageFor(key, itemSchema),
         };
+      }
+      if (!withDecorations) {
+        return null;
       }
       return {
         ...variableItem,
@@ -124,7 +140,7 @@ export function validateVariable(
       severity: 'warning',
       owner: 'variable-validation',
       ruleId: 'unknownVariableType',
-      hoverMessage: getVariableHoverMessage(parsedPath.propertyPath, refSchema),
+      hoverMessage: hoverMessageFor(parsedPath.propertyPath, refSchema),
     };
   }
 
@@ -135,8 +151,12 @@ export function validateVariable(
       severity: 'warning',
       owner: 'variable-validation',
       ruleId: 'unknownVariableType',
-      hoverMessage: getVariableHoverMessage(parsedPath.propertyPath, refSchema),
+      hoverMessage: hoverMessageFor(parsedPath.propertyPath, refSchema),
     };
+  }
+
+  if (!withDecorations) {
+    return null;
   }
 
   return {
