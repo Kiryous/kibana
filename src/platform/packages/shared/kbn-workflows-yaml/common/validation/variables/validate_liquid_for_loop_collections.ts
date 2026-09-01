@@ -11,18 +11,21 @@ import type { Document } from 'yaml';
 import type { WorkflowYaml } from '@kbn/workflows';
 import type { WorkflowGraph } from '@kbn/workflows/graph';
 import type { YamlValidationResult } from '../types';
+import type { StepContextResolver } from '../context/step_context_resolver';
 import { validateLiquidYamlScalars } from './validate_liquid_yaml_scalars';
 
 export function validateLiquidForLoopCollections(
   yamlString: string,
   yamlDocument: Document,
   workflowGraph: WorkflowGraph,
-  workflowDefinition: WorkflowYaml
+  workflowDefinition: WorkflowYaml,
+  stepContextResolver?: StepContextResolver
 ): YamlValidationResult[] {
   return validateLiquidYamlScalars(
     yamlString,
     yamlDocument,
     workflowGraph,
-    workflowDefinition
+    workflowDefinition,
+    stepContextResolver
   ).filter((result) => result.owner === 'variable-validation');
 }
