@@ -12,20 +12,14 @@
  *
  * Source: elasticsearch-specification repository, operations: search, search-1, search-2, search-3
  * This override is used to add the `index` parameter to the paramsSchema
+ * Schemas come from @elastic/schemas (elastic/schemas-js) instead of the openapi-ts output.
  */
 
+import { Indices } from '@elastic/schemas/es/schemas/_types.js';
+import { SearchRequest, SearchResponse } from '@elastic/schemas/es/schemas/search.js';
 import { z } from '@kbn/zod/v4';
 
-import { getShapeAt } from '../../../common/utils/zod';
-
-// import all needed request and response schemas generated from the OpenAPI spec
 import type { InternalConnectorContract } from '../../../types/latest';
-import {
-  global_search_response_body,
-  search,
-  search_request,
-  types_indices,
-} from '../generated/schemas/es_openapi_zod.gen';
 
 // export contract
 export const SEARCH_CONTRACT: InternalConnectorContract = {
@@ -142,12 +136,10 @@ This situation can occur because the splitting criterion is based on Lucene docu
       'stats',
     ],
   },
-  paramsSchema: z.object({
-    ...search.shape,
-    ...getShapeAt(search_request, 'query'),
-    index: types_indices,
+  paramsSchema: SearchRequest.extend({
+    index: Indices,
     // The OpenAPI-generated schema for sort is too restrictive; ES accepts complex body-sort objects that the schema rejects.
     sort: z.any().optional(),
   }),
-  outputSchema: global_search_response_body,
+  outputSchema: SearchResponse,
 };
