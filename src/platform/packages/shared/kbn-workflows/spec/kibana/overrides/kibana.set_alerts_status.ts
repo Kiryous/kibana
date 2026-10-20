@@ -14,13 +14,13 @@
  */
 
 // import all needed request and response schemas generated from the OpenAPI spec
+import {
+  SetAlertsStatusRequest,
+  SetAlertsStatusResponse,
+} from '@elastic/schemas/kibana/schemas/set_alerts_status.js';
 import type { InternalConnectorContract } from '../../../types/latest';
 
 import { insertFetcherToSchemaRecursively } from '../../lib/insert_fetcher_to_schema';
-import {
-  set_alerts_status_request,
-  set_alerts_status_response,
-} from '../generated/schemas/kibana_openapi_zod.gen';
 
 // export contract
 export const SET_ALERTS_STATUS_CONTRACT: InternalConnectorContract = {
@@ -42,6 +42,6 @@ Set the status of one or more detection alerts.`,
     urlParams: [],
     bodyParams: ['reason', 'signal_ids', 'status', 'conflicts', 'query'],
   },
-  paramsSchema: insertFetcherToSchemaRecursively(set_alerts_status_request.shape.body),
-  outputSchema: set_alerts_status_response,
+  paramsSchema: insertFetcherToSchemaRecursively(SetAlertsStatusRequest),
+  outputSchema: SetAlertsStatusResponse,
 };

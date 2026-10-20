@@ -15,19 +15,17 @@
  * and uses passthrough() to preserve all mapping properties.
  */
 
+import { IndexName } from '@elastic/schemas/es/schemas/_types.js';
+import {
+  IndicesCreateRequest,
+  IndicesCreateResponse,
+} from '@elastic/schemas/es/schemas/indices.create.js';
+import { IndicesAlias, IndicesIndexSettings } from '@elastic/schemas/es/schemas/indices.js';
 import { z } from '@kbn/zod/v4';
-
-import { getShapeAt } from '../../../common/utils/zod';
 
 // import all needed request and response schemas generated from the OpenAPI spec
 import type { InternalConnectorContract } from '../../../types/latest';
-import {
-  indices_create_request,
-  indices_create_response,
-  indices_types_alias,
-  indices_types_index_settings,
-  types_index_name,
-} from '../generated/schemas/es_openapi_zod.gen';
+import { missingRoutingParams, pickFoundIn } from '../../lib/schemas_js';
 
 /**
  * Custom property definition schema that allows implicit object types.
@@ -94,11 +92,12 @@ Note that changing this setting will also affect the \`wait_for_active_shards\` 
     bodyParams: ['aliases', 'mappings', 'settings'],
   },
   paramsSchema: z.object({
-    index: types_index_name,
-    aliases: z.optional(z.record(z.string(), indices_types_alias)),
+    index: IndexName,
+    aliases: z.optional(z.record(z.string(), IndicesAlias)),
     mappings: z.optional(customMappingsSchema),
-    settings: z.optional(indices_types_index_settings),
-    ...getShapeAt(indices_create_request, 'query'),
+    settings: z.optional(IndicesIndexSettings),
+    ...pickFoundIn(IndicesCreateRequest, 'query'),
+    wait_for_active_shards: missingRoutingParams.wait_for_active_shards,
   }),
-  outputSchema: indices_create_response,
+  outputSchema: IndicesCreateResponse,
 };

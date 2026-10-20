@@ -15,10 +15,8 @@
  * To regenerate: node scripts/generate_workflow_es_contracts.js
  */
 
-import { z } from '@kbn/zod/v4';
-
-import { update_request, update_response } from './schemas/es_openapi_zod.gen';
-import { getShapeAt } from '../../../common/utils/zod';
+import { UpdateRequest, UpdateResponse } from '@elastic/schemas/es/schemas/update.js';
+import { missingRoutingParams } from '../../lib/schemas_js';
 
 // import all needed request and response schemas generated from the OpenAPI spec
 import type { InternalConnectorContract } from '../../../types/latest';
@@ -80,10 +78,6 @@ For usage examples such as partial updates, upserts, and scripted updates, see t
       'upsert',
     ],
   },
-  paramsSchema: z.object({
-    ...getShapeAt(update_request, 'body'),
-    ...getShapeAt(update_request, 'path'),
-    ...getShapeAt(update_request, 'query'),
-  }),
-  outputSchema: update_response,
+  paramsSchema: UpdateRequest.extend(missingRoutingParams),
+  outputSchema: UpdateResponse,
 };

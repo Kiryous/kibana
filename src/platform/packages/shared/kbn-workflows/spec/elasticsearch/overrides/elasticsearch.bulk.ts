@@ -16,19 +16,18 @@
  * 2. Uses passthrough() on operations to preserve arbitrary document fields
  */
 
+import { Indices } from '@elastic/schemas/es/schemas/_types.js';
+import {
+  BulkOperationContainer,
+  BulkRequest,
+  BulkResponse,
+  BulkUpdateAction,
+} from '@elastic/schemas/es/schemas/bulk.js';
 import { z } from '@kbn/zod/v4';
-
-import { getShapeAt } from '../../../common/utils/zod';
 
 // import all needed request and response schemas generated from the OpenAPI spec
 import type { InternalConnectorContract } from '../../../types/latest';
-import {
-  bulk2_request,
-  bulk_response,
-  global_bulk_operation_container,
-  global_bulk_update_action,
-  types_indices,
-} from '../generated/schemas/es_openapi_zod.gen';
+import { missingRoutingParams, pickFoundIn } from '../../lib/schemas_js';
 
 /**
  * Custom bulk operations schema that uses passthrough() to preserve all fields.
@@ -41,8 +40,17 @@ import {
  */
 const bulkOperationsSchema = z.array(
   z.union([
-    global_bulk_operation_container.loose(),
-    global_bulk_update_action.loose(),
+    ...BulkOperationContainer.options.map((option) =>
+      z.looseObject(
+        Object.fromEntries(
+          Object.entries(option.shape).map(([action, operation]) => [
+            action,
+            operation.extend({ routing: missingRoutingParams.routing }).loose(),
+          ])
+        )
+      )
+    ),
+    BulkUpdateAction.loose(),
     z.record(z.string(), z.unknown()),
   ])
 );
@@ -121,9 +129,10 @@ If you provide a target in the request path, it is used for any actions that don
     bodyParams: [],
   },
   paramsSchema: z.object({
-    index: z.optional(types_indices),
+    index: z.optional(Indices),
     operations: bulkOperationsSchema,
-    ...getShapeAt(bulk2_request, 'query'),
+    ...pickFoundIn(BulkRequest, 'query'),
+    ...missingRoutingParams,
   }),
-  outputSchema: bulk_response,
+  outputSchema: BulkResponse,
 };

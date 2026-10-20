@@ -17,8 +17,7 @@
 
 import { z } from '@kbn/zod/v4';
 
-import { get_streams_name_request } from './schemas/kibana_openapi_zod.gen';
-import { getShapeAt } from '../../../common/utils/zod';
+import { buildParamsSchema } from '../../../common/utils/zod';
 
 // import all needed request and response schemas generated from the OpenAPI spec
 import type { InternalConnectorContract } from '../../../types/latest';
@@ -46,12 +45,12 @@ Fetches a stream definition and associated dashboards<br/><br/>[Required authori
     urlParams: [],
     bodyParams: [],
   },
-  paramsSchema: z.object({
-    ...getShapeAt(get_streams_name_request, 'body'),
-    ...getShapeAt(get_streams_name_request, 'path'),
-    ...getShapeAt(get_streams_name_request, 'query'),
-    fetcher: FetcherConfigSchema,
-    ...KibanaStepMetaSchema,
+  paramsSchema: buildParamsSchema({
+    requestSchema: z.object({ path: z.object({ name: z.string().describe('The name of the stream.') }) }),
+    additionalSchemas: {
+      fetcher: FetcherConfigSchema,
+      ...KibanaStepMetaSchema,
+    },
   }),
   outputSchema: z.optional(z.looseObject({})),
 };

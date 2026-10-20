@@ -17,8 +17,11 @@
 
 import { z } from '@kbn/zod/v4';
 
-import { set_alert_tags_request, set_alert_tags_response } from './schemas/kibana_openapi_zod.gen';
-import { getShapeAt } from '../../../common/utils/zod';
+import {
+  SetAlertTagsResponse,
+  Security_Detections_API_SetAlertTagsBody,
+} from '@elastic/schemas/kibana/schemas/set_alert_tags.js';
+import { buildParamsSchema } from '../../../common/utils/zod';
 
 // import all needed request and response schemas generated from the OpenAPI spec
 import type { InternalConnectorContract } from '../../../types/latest';
@@ -48,12 +51,12 @@ And tags to detection alerts, and remove them from alerts.
     urlParams: [],
     bodyParams: ['ids', 'tags'],
   },
-  paramsSchema: z.object({
-    ...getShapeAt(set_alert_tags_request, 'body'),
-    ...getShapeAt(set_alert_tags_request, 'path'),
-    ...getShapeAt(set_alert_tags_request, 'query'),
-    fetcher: FetcherConfigSchema,
-    ...KibanaStepMetaSchema,
+  paramsSchema: buildParamsSchema({
+    requestSchema: z.object({ body: Security_Detections_API_SetAlertTagsBody }),
+    additionalSchemas: {
+      fetcher: FetcherConfigSchema,
+      ...KibanaStepMetaSchema,
+    },
   }),
-  outputSchema: set_alert_tags_response,
+  outputSchema: SetAlertTagsResponse,
 };

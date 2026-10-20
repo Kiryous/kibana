@@ -15,10 +15,7 @@
  * To regenerate: node scripts/generate_workflow_es_contracts.js
  */
 
-import { z } from '@kbn/zod/v4';
-
-import { indices_delete_request, indices_delete_response } from './schemas/es_openapi_zod.gen';
-import { getShapeAt } from '../../../common/utils/zod';
+import { IndicesDeleteRequest, IndicesDeleteResponse } from '@elastic/schemas/es/schemas/indices.delete.js';
 
 // import all needed request and response schemas generated from the OpenAPI spec
 import type { InternalConnectorContract } from '../../../types/latest';
@@ -53,10 +50,6 @@ You can then use the delete index API to delete the previous write index.
     ],
     bodyParams: [],
   },
-  paramsSchema: z.object({
-    ...getShapeAt(indices_delete_request, 'body'),
-    ...getShapeAt(indices_delete_request, 'path'),
-    ...getShapeAt(indices_delete_request, 'query'),
-  }),
-  outputSchema: indices_delete_response,
+  paramsSchema: IndicesDeleteRequest,
+  outputSchema: IndicesDeleteResponse,
 };

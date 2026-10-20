@@ -17,11 +17,9 @@
 
 import { z } from '@kbn/zod/v4';
 
-import {
-  create_case_default_space_request,
-  create_case_default_space_response,
-} from './schemas/kibana_openapi_zod.gen';
-import { getShapeAt } from '../../../common/utils/zod';
+import { Cases_create_case_request } from '@elastic/schemas/kibana/schemas/create_case.js';
+import { Cases_case_response_properties } from '@elastic/schemas/kibana/schemas/schemas/misc.js';
+import { buildParamsSchema } from '../../../common/utils/zod';
 
 // import all needed request and response schemas generated from the OpenAPI spec
 import type { InternalConnectorContract } from '../../../types/latest';
@@ -61,12 +59,12 @@ You must have \`all\` privileges for the **Cases** feature in the **Management**
       'title',
     ],
   },
-  paramsSchema: z.object({
-    ...getShapeAt(create_case_default_space_request, 'body'),
-    ...getShapeAt(create_case_default_space_request, 'path'),
-    ...getShapeAt(create_case_default_space_request, 'query'),
-    fetcher: FetcherConfigSchema,
-    ...KibanaStepMetaSchema,
+  paramsSchema: buildParamsSchema({
+    requestSchema: z.object({ body: Cases_create_case_request }),
+    additionalSchemas: {
+      fetcher: FetcherConfigSchema,
+      ...KibanaStepMetaSchema,
+    },
   }),
-  outputSchema: create_case_default_space_response,
+  outputSchema: Cases_case_response_properties,
 };

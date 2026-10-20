@@ -16,18 +16,13 @@
  *
  */
 
+import { WriteResponseBase } from '@elastic/schemas/es/schemas/_types.js';
+import { IndexRequest } from '@elastic/schemas/es/schemas/index.js';
 import { z } from '@kbn/zod/v4';
-
-import { getShapeAt } from '../../../common/utils/zod';
 
 // import all needed request and response schemas generated from the OpenAPI spec
 import type { InternalConnectorContract } from '../../../types/latest';
-import {
-  index1_request,
-  index2_request,
-  index_request,
-  types_write_response_base,
-} from '../generated/schemas/es_openapi_zod.gen';
+import { missingRoutingParams, pickFoundIn } from '../../lib/schemas_js';
 
 // export contract
 export const INDEX_CONTRACT: InternalConnectorContract = {
@@ -178,22 +173,10 @@ Even the simple case of updating the Elasticsearch index using data from a datab
     ],
     bodyParams: [],
   },
-  paramsSchema: z.union([
-    z.strictObject({
-      document: index_request.shape.body.optional(),
-      ...getShapeAt(index_request, 'path'),
-      ...getShapeAt(index_request, 'query'),
-    }),
-    z.strictObject({
-      document: index1_request.shape.body.optional(),
-      ...getShapeAt(index1_request, 'path'),
-      ...getShapeAt(index1_request, 'query'),
-    }),
-    z.strictObject({
-      document: index2_request.shape.body.optional(),
-      ...getShapeAt(index2_request, 'path'),
-      ...getShapeAt(index2_request, 'query'),
-    }),
-  ]),
-  outputSchema: types_write_response_base,
+  paramsSchema: z.strictObject({
+    document: IndexRequest.shape.document.optional(),
+    ...pickFoundIn(IndexRequest, 'path', 'query'),
+    ...missingRoutingParams,
+  }),
+  outputSchema: WriteResponseBase,
 };

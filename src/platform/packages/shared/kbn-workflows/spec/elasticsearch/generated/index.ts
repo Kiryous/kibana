@@ -18,13 +18,13 @@
  */
 
 // import contracts from individual files
-import { BULK_CONTRACT } from './elasticsearch.bulk.gen';
+import { BULK_CONTRACT } from '../overrides/elasticsearch.bulk';
 import { ESQL_QUERY_CONTRACT } from './elasticsearch.esql_query.gen';
-import { INDEX_CONTRACT } from './elasticsearch.index.gen';
-import { INDICES_CREATE_CONTRACT } from './elasticsearch.indices_create.gen';
+import { INDEX_CONTRACT } from '../overrides/elasticsearch.index';
+import { INDICES_CREATE_CONTRACT } from '../overrides/elasticsearch.indices_create';
 import { INDICES_DELETE_CONTRACT } from './elasticsearch.indices_delete.gen';
 import { INDICES_EXISTS_CONTRACT } from './elasticsearch.indices_exists.gen';
-import { SEARCH_CONTRACT } from './elasticsearch.search.gen';
+import { SEARCH_CONTRACT } from '../overrides/elasticsearch.search';
 import { UPDATE_CONTRACT } from './elasticsearch.update.gen';
 import type { InternalConnectorContract } from '../../../types/latest';
 

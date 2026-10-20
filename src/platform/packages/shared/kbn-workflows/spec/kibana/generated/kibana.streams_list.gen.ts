@@ -17,8 +17,7 @@
 
 import { z } from '@kbn/zod/v4';
 
-import { get_streams_request } from './schemas/kibana_openapi_zod.gen';
-import { getShapeAt } from '../../../common/utils/zod';
+import { buildParamsSchema } from '../../../common/utils/zod';
 
 // import all needed request and response schemas generated from the OpenAPI spec
 import type { InternalConnectorContract } from '../../../types/latest';
@@ -46,12 +45,12 @@ Fetches list of all streams<br/><br/>[Required authorization] Route required pri
     urlParams: [],
     bodyParams: [],
   },
-  paramsSchema: z.object({
-    ...getShapeAt(get_streams_request, 'body'),
-    ...getShapeAt(get_streams_request, 'path'),
-    ...getShapeAt(get_streams_request, 'query'),
-    fetcher: FetcherConfigSchema,
-    ...KibanaStepMetaSchema,
+  paramsSchema: buildParamsSchema({
+    requestSchema: z.object({}),
+    additionalSchemas: {
+      fetcher: FetcherConfigSchema,
+      ...KibanaStepMetaSchema,
+    },
   }),
   outputSchema: z.optional(z.looseObject({})),
 };

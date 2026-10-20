@@ -17,8 +17,7 @@
 
 import { z } from '@kbn/zod/v4';
 
-import { indices_exists_request } from './schemas/es_openapi_zod.gen';
-import { getShapeAt } from '../../../common/utils/zod';
+import { IndicesExistsRequest } from '@elastic/schemas/es/schemas/indices.exists.js';
 
 // import all needed request and response schemas generated from the OpenAPI spec
 import type { InternalConnectorContract } from '../../../types/latest';
@@ -49,10 +48,6 @@ Check if one or more indices, index aliases, or data streams exist.
     ],
     bodyParams: [],
   },
-  paramsSchema: z.object({
-    ...getShapeAt(indices_exists_request, 'body'),
-    ...getShapeAt(indices_exists_request, 'path'),
-    ...getShapeAt(indices_exists_request, 'query'),
-  }),
+  paramsSchema: IndicesExistsRequest,
   outputSchema: z.optional(z.looseObject({})),
 };

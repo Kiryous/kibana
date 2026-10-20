@@ -14,16 +14,15 @@
  * This override is to support union body with both 'alert' and 'user' comment types.
  */
 
+import { Cases_add_case_comment_request } from '@elastic/schemas/kibana/schemas/add_case_comment.js';
+import { Cases_case_response_properties } from '@elastic/schemas/kibana/schemas/schemas/misc.js';
+import { z } from '@kbn/zod/v4';
 import { buildParamsSchema } from '../../../common/utils/zod';
 
 // import all needed request and response schemas generated from the OpenAPI spec
 import type { InternalConnectorContract } from '../../../types/latest';
 
 import { FetcherConfigSchema, KibanaStepMetaSchema } from '../../schema';
-import {
-  add_case_comment_default_space_request,
-  add_case_comment_default_space_response,
-} from '../generated/schemas/kibana_openapi_zod.gen';
 
 // export contract
 export const ADD_CASE_COMMENT_CONTRACT: InternalConnectorContract = {
@@ -48,11 +47,14 @@ You must have \`all\` privileges for the **Cases** feature in the **Management**
     bodyParams: ['alertId', 'index', 'owner', 'rule', 'type', 'comment'],
   },
   paramsSchema: buildParamsSchema({
-    requestSchema: add_case_comment_default_space_request,
+    requestSchema: z.object({
+      body: Cases_add_case_comment_request,
+      path: z.object({ caseId: z.string().describe('The identifier for the case.') }),
+    }),
     additionalSchemas: {
       fetcher: FetcherConfigSchema,
       ...KibanaStepMetaSchema,
     },
   }),
-  outputSchema: add_case_comment_default_space_response,
+  outputSchema: Cases_case_response_properties,
 };
