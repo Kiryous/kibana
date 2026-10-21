@@ -8,7 +8,8 @@
  */
 
 import {
-  registerPageFormRoute,
+  registerPageAppRoute,
+  registerPageDefinitionRoute,
   registerPageLinkRoute,
   registerPageRotateRoute,
   registerPageSubmitRoute,
@@ -31,7 +32,8 @@ export function registerPageRoutes(deps: RouteDependencies) {
     return;
   }
 
-  registerPageFormRoute(deps);
+  registerPageAppRoute(deps);
+  registerPageDefinitionRoute(deps);
   registerPageSubmitRoute(deps);
   registerPageLinkRoute(deps);
   registerPageRotateRoute(deps);
